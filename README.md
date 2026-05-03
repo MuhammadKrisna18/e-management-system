@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sistem Pemesanan Event (Week 8)
 
 ## Aturan Bisnis
@@ -14,3 +15,6 @@
 
 ### Publikasi Event
 - Event harus memiliki minimal satu kategori tiket
+=======
+# ManagementSystem
+>>>>>>> 01f0661a8c31b53d73dd8f5e1a2dcc837fe489a0
