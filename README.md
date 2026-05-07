@@ -3,9 +3,9 @@ Event Ticketing & Booking System using Clean Architecture and Domain-Driven Desi
 
 ---
 
-# 📌 Week 8 — Project Structure
+# Week 8 — Project Structure
 
-## 🎯 Objectives
+## Objectives
 
 This week focuses on:
 - Clean Architecture folder structure
@@ -15,7 +15,7 @@ This week focuses on:
 
 ---
 
-# 🏗️ Clean Architecture Folder Structure
+# Clean Architecture Folder Structure
 
 ```bash
 E-MANAGEMENT-SYSTEM/
@@ -66,7 +66,7 @@ E-MANAGEMENT-SYSTEM/
 
 ---
 
-# 🧠 Initial Business Rules
+# Initial Business Rules
 
 ## Event Rules
 - Event end date cannot be earlier than start date
@@ -133,7 +133,7 @@ E-MANAGEMENT-SYSTEM/
 
 ---
 
-# 🧩 Initial Domain Model Draft
+# Initial Domain Model Draft
 
 ## Aggregates
 
@@ -179,7 +179,7 @@ Responsibilities:
 
 ---
 
-# 📦 Main Entities
+# Main Entities
 
 | Entity | Description |
 |---|---|
@@ -193,7 +193,7 @@ Responsibilities:
 
 ---
 
-# 💎 Value Objects
+# Value Objects
 
 | Value Object | Description |
 |---|---|
@@ -204,7 +204,7 @@ Responsibilities:
 
 ---
 
-# 🔔 Initial Domain Events
+# Initial Domain Events
 
 | Domain Event | Description |
 |---|---|
@@ -224,7 +224,7 @@ Responsibilities:
 
 ---
 
-# 📖 Ubiquitous Language Glossary
+# Ubiquitous Language Glossary
 
 | Term | Meaning |
 |---|---|
@@ -247,7 +247,7 @@ Responsibilities:
 
 ---
 
-# ⚙️ Technology Stack
+# Technology Stack
 
 | Technology | Usage |
 |---|---|
@@ -260,7 +260,7 @@ Responsibilities:
 
 ---
 
-# 🚀 How to Run the Project
+# How to Run the Project
 
 ## Create Virtual Environment
 
