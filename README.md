@@ -1,17 +1,39 @@
 # E-Management System
-Event Ticketing & Booking System using Clean Architecture and Domain-Driven Design (DDD) by Krisna Putra & Arya Raka
+
+Sistem Event Ticketing & Booking menggunakan Clean Architecture dan Domain-Driven Design (DDD)
+
+Disusun oleh:
+- Krisna Putra
+- Arya Raka
 
 ---
 
-# Week 8 — Project Structure
+# Deskripsi Project
 
-## Objectives
+E-Management System merupakan sistem pemesanan dan pengelolaan tiket event yang dibangun menggunakan pendekatan:
 
-This week focuses on:
-- Clean Architecture folder structure
-- Initial business rules derived from user stories and acceptance criteria
-- Initial domain model draft
-- Initial ubiquitous language glossary
+- Clean Architecture
+- Domain-Driven Design (DDD)
+
+Sistem ini memungkinkan:
+- Event Organizer membuat dan mengelola event
+- Customer memesan dan membeli tiket
+- Gate Officer melakukan validasi tiket
+- System Admin mengelola proses refund
+
+Project ini dikembangkan sebagai studi kasus mata kuliah:
+**Konstruksi Perangkat Lunak (Software Construction)**
+
+---
+
+# Tujuan Project
+
+Project ini bertujuan untuk:
+- Menerapkan Clean Architecture
+- Menerapkan DDD Tactical Pattern
+- Memisahkan domain logic dari framework
+- Membuat software yang maintainable dan scalable
+- Mengimplementasikan business rules berdasarkan user stories
 
 ---
 
@@ -66,82 +88,88 @@ E-MANAGEMENT-SYSTEM/
 
 ---
 
-# Initial Business Rules
+# Business Rules
 
 ## Event Rules
-- Event end date cannot be earlier than start date
-- Event capacity must be greater than zero
-- Newly created event status must be `Draft`
-- Only events with status `Draft` can be published
-- Cancelled events cannot be published
-- Published events must have at least one active ticket category
-- Total ticket category quota cannot exceed event capacity
+
+- Event end date tidak boleh lebih awal dari start date
+- Kapasitas event harus lebih besar dari 0
+- Status default event baru adalah `Draft`
+- Event hanya dapat dipublish jika memiliki minimal satu ticket category aktif
+- Event dengan status `Cancelled` tidak dapat dipublish
+- Total quota ticket category tidak boleh melebihi kapasitas event
 
 ---
 
 ## Ticket Category Rules
-- Ticket category must have:
+
+- Ticket category harus memiliki:
   - Name
   - Price
   - Quota
-  - Sales start date
-  - Sales end date
-- Ticket price cannot be negative
-- Ticket quota must be greater than zero
-- Ticket sales period must end before or on the event start date
-- Disabled ticket categories cannot be purchased
+  - Sales Start Date
+  - Sales End Date
+- Harga tiket tidak boleh negatif
+- Quota tiket harus lebih besar dari 0
+- Masa penjualan tiket harus selesai sebelum event dimulai
+- Ticket category yang nonaktif tidak dapat dibeli
 
 ---
 
 ## Booking Rules
-- Booking can only be created for Published events
-- Booking quantity must be greater than zero
-- Booking quantity cannot exceed remaining quota
-- Customer cannot have more than one active booking for the same event
-- Newly created booking status must be `PendingPayment`
-- Booking must have payment deadline
+
+- Booking hanya dapat dibuat untuk event dengan status `Published`
+- Quantity booking harus lebih besar dari 0
+- Quantity booking tidak boleh melebihi quota tersisa
+- Customer tidak dapat memiliki lebih dari satu booking aktif untuk event yang sama
+- Status default booking baru adalah `PendingPayment`
+- Booking memiliki payment deadline
 
 ---
 
 ## Payment Rules
-- Only bookings with status `PendingPayment` can be paid
-- Booking cannot be paid after payment deadline
-- Payment amount must equal total booking price
-- Successful payment changes booking status to `Paid`
+
+- Hanya booking dengan status `PendingPayment` yang dapat dibayar
+- Booking tidak dapat dibayar setelah payment deadline
+- Jumlah pembayaran harus sesuai total booking
+- Pembayaran berhasil mengubah status booking menjadi `Paid`
 
 ---
 
 ## Ticket Rules
-- Each ticket must have unique ticket code
-- Ticket statuses:
+
+- Setiap ticket memiliki kode unik
+- Status ticket:
   - Active
   - CheckedIn
   - Cancelled
-- Checked-in ticket cannot be checked in again
+- Ticket yang sudah check-in tidak dapat digunakan kembali
 
 ---
 
 ## Refund Rules
-- Refund can only be requested for Paid bookings
-- Refund cannot be requested if ticket already checked in
-- Refund statuses:
+
+- Refund hanya dapat diminta untuk booking dengan status `Paid`
+- Refund tidak dapat dilakukan jika ticket sudah check-in
+- Status refund:
   - Requested
   - Approved
   - Rejected
   - PaidOut
-- Rejected refund must include rejection reason
+- Refund yang ditolak wajib memiliki alasan penolakan
 
 ---
 
-# Initial Domain Model Draft
+# Domain Model
 
 ## Aggregates
 
 ### Event Aggregate
-Root Aggregate:
+
+Aggregate Root:
 - Event
 
-Contains:
+Entity di dalam aggregate:
 - TicketCategory
 
 Responsibilities:
@@ -153,14 +181,15 @@ Responsibilities:
 ---
 
 ### Booking Aggregate
-Root Aggregate:
+
+Aggregate Root:
 - Booking
 
-Contains:
+Entity di dalam aggregate:
 - Ticket
 
 Responsibilities:
-- Reserve Tickets
+- Reserve Ticket
 - Calculate Total Price
 - Handle Payment
 - Expire Booking
@@ -168,7 +197,8 @@ Responsibilities:
 ---
 
 ### Refund Aggregate
-Root Aggregate:
+
+Aggregate Root:
 - Refund
 
 Responsibilities:
@@ -181,46 +211,83 @@ Responsibilities:
 
 # Main Entities
 
-| Entity | Description |
+| Entity | Deskripsi |
 |---|---|
-| Event | Represents an event |
-| TicketCategory | Represents ticket type |
-| Booking | Represents customer booking |
-| Ticket | Represents generated ticket |
-| Refund | Represents refund request |
-| Customer | Represents customer |
-| Organizer | Represents event organizer |
+| Event | Merepresentasikan event |
+| TicketCategory | Merepresentasikan jenis tiket |
+| Booking | Merepresentasikan booking customer |
+| Ticket | Merepresentasikan tiket |
+| Refund | Merepresentasikan refund |
+| Customer | Merepresentasikan customer |
+| Organizer | Merepresentasikan event organizer |
 
 ---
 
 # Value Objects
 
-| Value Object | Description |
+| Value Object | Deskripsi |
 |---|---|
-| Money | Represents amount and currency |
-| EventSchedule | Represents event start and end date |
-| TicketCode | Unique ticket identifier |
-| PaymentDeadline | Booking expiration deadline |
+| Money | Representasi nominal uang |
+| EventSchedule | Representasi jadwal event |
+| TicketCode | Kode unik ticket |
+| PaymentDeadline | Deadline pembayaran booking |
 
 ---
 
-# Initial Domain Events
+# Domain Events
 
-| Domain Event | Description |
+| Domain Event | Deskripsi |
 |---|---|
-| EventCreated | Triggered after event creation |
-| EventPublished | Triggered after event published |
-| EventCancelled | Triggered after event cancelled |
-| TicketCategoryCreated | Triggered after ticket category created |
-| TicketCategoryDisabled | Triggered after ticket category disabled |
-| TicketReserved | Triggered after booking created |
-| BookingPaid | Triggered after successful payment |
-| BookingExpired | Triggered after booking expired |
-| TicketCheckedIn | Triggered after successful check-in |
-| RefundRequested | Triggered after refund requested |
-| RefundApproved | Triggered after refund approved |
-| RefundRejected | Triggered after refund rejected |
-| RefundPaidOut | Triggered after refund payout completed |
+| EventCreated | Event berhasil dibuat |
+| EventPublished | Event berhasil dipublish |
+| EventCancelled | Event dibatalkan |
+| TicketCategoryCreated | Ticket category dibuat |
+| TicketCategoryDisabled | Ticket category dinonaktifkan |
+| TicketReserved | Ticket berhasil direserve |
+| BookingPaid | Booking berhasil dibayar |
+| BookingExpired | Booking expired |
+| TicketCheckedIn | Ticket berhasil check-in |
+| RefundRequested | Refund diminta |
+| RefundApproved | Refund disetujui |
+| RefundRejected | Refund ditolak |
+| RefundPaidOut | Refund berhasil dibayar |
+
+---
+
+# Repository Interfaces
+
+Repository interface digunakan untuk memisahkan domain layer dari implementation database.
+
+Repository yang digunakan:
+- EventRepository
+- BookingRepository
+- RefundRepository
+
+---
+
+# Domain Services
+
+Domain service digunakan untuk business logic yang tidak cocok ditempatkan pada entity.
+
+Domain service yang digunakan:
+- PricingService
+
+Responsibilities:
+- Menghitung total harga booking
+- Menambahkan service fee
+- Menghasilkan value object `Money`
+
+---
+
+# Application Service Interfaces
+
+Interface external service yang direncanakan:
+
+| Interface | Fungsi |
+|---|---|
+| PaymentGatewayInterface | Memproses pembayaran |
+| NotificationServiceInterface | Mengirim notifikasi |
+| RefundPaymentServiceInterface | Memproses refund payout |
 
 ---
 
@@ -228,75 +295,21 @@ Responsibilities:
 
 | Term | Meaning |
 |---|---|
-| Event | An activity organized by Event Organizer |
-| Event Organizer | User who creates and manages events |
-| Customer | User who books and purchases tickets |
-| Gate Officer | User who validates tickets |
-| Ticket Category | Ticket type such as VIP or Regular |
-| Booking | Temporary ticket reservation |
-| PendingPayment | Waiting for customer payment |
-| Paid | Booking payment completed |
-| Expired | Payment deadline passed |
-| Ticket | Proof of attendance |
-| Ticket Code | Unique ticket identifier |
-| Check-in | Ticket validation process |
-| Refund | Returning money to customer |
-| Money | Value object for amount and currency |
-| Sales Period | Ticket selling period |
-| Payment Deadline | Deadline for booking payment |
+| Event | Aktivitas yang dibuat organizer |
+| Event Organizer | User yang mengelola event |
+| Customer | User yang membeli tiket |
+| Gate Officer | User yang memvalidasi tiket |
+| Ticket Category | Jenis tiket seperti VIP atau Regular |
+| Booking | Reservasi tiket sementara |
+| PendingPayment | Menunggu pembayaran |
+| Paid | Pembayaran berhasil |
+| Expired | Payment deadline terlewati |
+| Ticket | Bukti kehadiran |
+| Ticket Code | Kode unik tiket |
+| Check-in | Proses validasi tiket |
+| Refund | Pengembalian uang |
+| Money | Value object nominal uang |
+| Sales Period | Masa penjualan tiket |
+| Payment Deadline | Deadline pembayaran |
 
 ---
-
-# Technology Stack
-
-| Technology | Usage |
-|---|---|
-| Python | Main Programming Language |
-| FastAPI | Backend REST API Framework |
-| PostgreSQL | Database |
-| SQLAlchemy | ORM |
-| Alembic | Database Migration |
-| Pytest | Unit Testing |
-
----
-
-# How to Run the Project
-
-## Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
----
-
-## Activate Virtual Environment
-
-### Windows
-```bash
-venv\Scripts\activate
-```
-
-### Linux / Mac
-```bash
-source venv/bin/activate
-```
-
----
-
-## Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## Run FastAPI Server
-
-```bash
-uvicorn app.main:app --reload
-```
-
----
-
