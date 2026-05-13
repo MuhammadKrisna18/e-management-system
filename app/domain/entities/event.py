@@ -13,4 +13,4 @@ class Event:
         self.start_date = start_date
         self.end_date = end_date
         self.capacity = capacity
-        self.status = "Draft"  # default rule
+        self.status = "Draft"

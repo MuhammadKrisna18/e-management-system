@@ -20,3 +20,12 @@ class EventAggregate:
             raise ValueError("Cannot publish event without ticket category")
 
         self.event.status = "Published"
+        
+    def cancel(self):
+        if self.event.status == "Completed":
+            raise ValueError("Completed event cannot be cancelled")
+        
+        self.event.status = "Cancelled"
+        
+        for category in self.ticket_categories:
+            category.disable()

@@ -10,3 +10,6 @@ class TicketCategory:
         self.price = price
         self.quota = quota
         self.is_active = True
+        
+    def disable(self):
+        self.is_active = False
