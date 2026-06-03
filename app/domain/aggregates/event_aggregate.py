@@ -1,6 +1,11 @@
 from app.domain.entities.event import Event
 from app.domain.entities.ticket_category import TicketCategory
-from app.domain.events.event_cancelled import EventCancelled
+from app.domain.events.event_events import (
+    EventPublished,
+    EventCancelled,
+    TicketCategoryCreated,
+    TicketCategoryDisabled
+)
 
 
 class EventAggregate:

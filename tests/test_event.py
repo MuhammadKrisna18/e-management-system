@@ -7,6 +7,15 @@ from app.domain.aggregates.event_aggregate import EventAggregate
 from app.domain.services.pricing_service import PricingService
 from app.domain.value_objects.money import Money
 
+from datetime import datetime, timedelta
+
+from app.domain.entities.booking import Booking
+from app.domain.entities.ticket import Ticket
+from app.domain.entities.refund import Refund
+
+from app.domain.aggregates.booking_aggregate import BookingAggregate
+from app.domain.aggregates.refund_aggregate import RefundAggregate
+
 
 # =========================================================
 # EVENT TESTS
@@ -357,4 +366,135 @@ def test_quantity_must_be_greater_than_zero():
         PricingService.calculate_total_price(
             ticket_price=100,
             quantity=0
+        )
+        
+        
+
+# =========================================================
+# BOOKING TESTS
+# =========================================================
+
+def test_booking_quantity_must_be_positive():
+
+    with pytest.raises(ValueError):
+
+        Booking(
+            "customer-1",
+            0
+        )
+
+
+def test_booking_cannot_pay_after_deadline():
+
+    booking = Booking(
+        "customer-1",
+        1
+    )
+
+    booking.payment_deadline.deadline = (
+        datetime.now()
+        - timedelta(minutes=1)
+    )
+
+    aggregate = BookingAggregate(
+        booking,
+        100
+    )
+
+    with pytest.raises(ValueError):
+        aggregate.pay(100)
+
+
+def test_booking_wrong_payment_amount():
+
+    booking = Booking(
+        "customer-1",
+        1
+    )
+
+    aggregate = BookingAggregate(
+        booking,
+        100
+    )
+
+    with pytest.raises(ValueError):
+        aggregate.pay(50)
+
+
+def test_paid_booking_cannot_expire():
+
+    booking = Booking(
+        "customer-1",
+        1
+    )
+
+    aggregate = BookingAggregate(
+        booking,
+        100
+    )
+
+    aggregate.pay(100)
+
+    with pytest.raises(ValueError):
+        aggregate.expire()
+
+
+# =========================================================
+# TICKET TESTS
+# =========================================================
+
+def test_ticket_cannot_checkin_twice():
+
+    ticket = Ticket(
+        "ABC123"
+    )
+
+    ticket.check_in()
+
+    with pytest.raises(ValueError):
+        ticket.check_in()
+
+
+# =========================================================
+# REFUND TESTS
+# =========================================================
+
+def test_refund_cannot_approve_if_not_requested():
+
+    refund = Refund()
+
+    aggregate = RefundAggregate(
+        refund
+    )
+
+    aggregate.approve()
+
+    with pytest.raises(ValueError):
+        aggregate.approve()
+
+
+def test_rejected_refund_must_have_reason():
+
+    refund = Refund()
+
+    aggregate = RefundAggregate(
+        refund
+    )
+
+    with pytest.raises(ValueError):
+        aggregate.reject("")
+
+
+def test_refund_mark_paid_out_requires_approved_status():
+
+    refund = Refund()
+
+    aggregate = RefundAggregate(
+        refund
+    )
+
+    with pytest.raises(ValueError):
+
+        aggregate.mark_paid_out(
+            "REF123"
         )
