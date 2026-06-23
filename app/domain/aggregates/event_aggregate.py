@@ -32,6 +32,9 @@ class EventAggregate:
 
         self.ticket_categories.append(category)
 
+        self.domain_events.append(
+            TicketCategoryCreated(category.name)
+        )
     def publish(self):
 
         active_categories = [
