@@ -1,77 +1,107 @@
+"""Booking Aggregate - Coordinates Booking and Tickets"""
+from datetime import datetime
+from app.domain.entities.booking import Booking
 from app.domain.entities.ticket import Ticket
-
-from app.domain.events.booking_events import (
-    BookingPaid,
-    BookingExpired
-)
+from app.domain.value_objects.ticket_code import TicketCode
+from app.domain.events.ticket_reserved import TicketReserved
+from app.domain.events.booking_paid import BookingPaid
+from app.domain.events.booking_expired import BookingExpired
 
 
 class BookingAggregate:
+    """
+    Aggregate for booking - coordinates Booking and Tickets.
+    Manages the lifecycle of bookings and associated tickets.
+    """
 
-    def __init__(
-        self,
-        booking,
-        total_price
-    ):
-
+    def __init__(self, booking: Booking):
+        """
+        Initialize booking aggregate.
+        
+        Args:
+            booking: Booking entity (aggregate root)
+        """
         self.booking = booking
-
-        self.total_price = total_price
-
-        self.tickets = []
-
         self.domain_events = []
 
-    def pay(
-        self,
-        amount
-    ):
+    def create_tickets(self):
+        """
+        Create tickets for the booking.
+        Generates unique ticket codes and creates Ticket entities.
+        
+        Raises:
+            ValueError: If tickets already created
+        """
+        if len(self.booking.tickets) > 0:
+            raise ValueError("Tickets already created for this booking")
 
-        if self.booking.status != "PendingPayment":
-            raise ValueError(
-                "Booking is not pending payment"
-            )
-
-        if (
-            self.booking.payment_deadline
-            .is_expired()
-        ):
-            raise ValueError(
-                "Payment deadline passed"
-            )
-
-        if amount != self.total_price:
-            raise ValueError(
-                "Incorrect payment amount"
-            )
-
-        self.booking.status = "Paid"
-
-        for i in range(
-            self.booking.quantity
-        ):
-
+        for i in range(self.booking.quantity):
+            ticket_code = TicketCode()
             ticket = Ticket(
-                f"TICKET-{i+1}"
+                ticket_code=ticket_code,
+                booking_id=self.booking.booking_id,
+                event_id=self.booking.event_id,
+                ticket_category_name=self.booking.ticket_category_name,
+                price=self.booking.unit_price,
             )
-
-            self.tickets.append(
-                ticket
-            )
+            self.booking.add_ticket(ticket)
 
         self.domain_events.append(
-            BookingPaid()
+            TicketReserved(
+                booking_id=self.booking.booking_id,
+                event_id=self.booking.event_id,
+                ticket_category=self.booking.ticket_category_name,
+                quantity=self.booking.quantity,
+                total_price=self.booking.total_price.amount,
+            )
         )
 
-    def expire(self):
-
-        if self.booking.status == "Paid":
-            raise ValueError(
-                "Paid booking cannot expire"
-            )
-
-        self.booking.status = "Expired"
+    def pay_booking(self, payment_reference: str, paid_at: datetime = None):
+        """
+        Process booking payment.
+        Marks booking as PAID and raises BookingPaid event.
+        
+        Args:
+            payment_reference: Payment transaction reference
+            paid_at: Payment timestamp (optional)
+        """
+        self.booking.pay(payment_reference, paid_at)
 
         self.domain_events.append(
-            BookingExpired()
+            BookingPaid(
+                booking_id=self.booking.booking_id,
+                event_id=self.booking.event_id,
+                customer_id=self.booking.customer_id,
+                total_price=self.booking.total_price.amount,
+                payment_reference=payment_reference,
+            )
         )
+
+    def expire_booking(self):
+        """
+        Expire the booking and release ticket quota.
+        Marks booking as EXPIRED and raises BookingExpired event.
+        """
+        self.booking.expire()
+
+        self.domain_events.append(
+            BookingExpired(
+                booking_id=self.booking.booking_id,
+                event_id=self.booking.event_id,
+                ticket_category=self.booking.ticket_category_name,
+                quantity=self.booking.quantity,
+            )
+        )
+
+    def get_domain_events(self):
+        """
+        Get all domain events for publishing.
+        
+        Returns:
+            List of domain events
+        """
+        return self.domain_events
+
+    def clear_domain_events(self):
+        """Clear domain events after publishing."""
+        self.domain_events = []
