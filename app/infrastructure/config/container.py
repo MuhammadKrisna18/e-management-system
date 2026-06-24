@@ -38,6 +38,9 @@ from app.application.command_handlers.cancel_event_handler import (
 from app.application.command_handlers.create_ticket_category_handler import (
     CreateTicketCategoryHandler
 )
+from app.application.command_handlers.disable_ticket_category_handler import (
+    DisableTicketCategoryHandler
+)
 from app.application.command_handlers.publish_event_handler import (
     PublishEventHandler
 )
@@ -103,6 +106,7 @@ class Container:
         self._create_event_handler = None
         self._cancel_event_handler = None
         self._create_ticket_category_handler = None
+        self._disable_ticket_category_handler = None
         self._publish_event_handler = None
         self._create_booking_handler = None
         self._pay_booking_handler = None
@@ -140,6 +144,12 @@ class Container:
             self._create_ticket_category_handler = CreateTicketCategoryHandler(self.event_repository)
         return self._create_ticket_category_handler
 
+    def get_disable_ticket_category_handler(self) -> DisableTicketCategoryHandler:
+        """Get DisableTicketCategoryHandler instance."""
+        if self._disable_ticket_category_handler is None:
+            self._disable_ticket_category_handler = DisableTicketCategoryHandler(self.event_repository)
+        return self._disable_ticket_category_handler
+
     def get_publish_event_handler(self) -> PublishEventHandler:
         """Get PublishEventHandler instance."""
         if self._publish_event_handler is None:
@@ -150,7 +160,8 @@ class Container:
         """Get CreateBookingHandler instance."""
         if self._create_booking_handler is None:
             self._create_booking_handler = CreateBookingHandler(
-                self.booking_repository
+                self.booking_repository,
+                self.event_repository
             )
         return self._create_booking_handler
 

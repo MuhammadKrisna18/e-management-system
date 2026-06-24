@@ -27,14 +27,14 @@ class TestBookingWorkflowIntegration:
         # Create booking
         booking_id = str(uuid.uuid4())
         booking = Booking(
-            booking_id=booking_id,
             customer_id="CUST001",
             event_id="EV001",
             ticket_category_name="VIP",
             quantity=2,
             unit_price=500000.0,
-            total_price=Money(1000000.0),
+            total_price=1000000.0,
         )
+        booking.booking_id = booking_id
 
         booking_agg = BookingAggregate(booking)
         booking_agg.create_tickets()
@@ -42,7 +42,7 @@ class TestBookingWorkflowIntegration:
 
         # Verify booking created with tickets
         saved_booking = self.booking_repository.get_by_id(booking_id)
-        assert saved_booking.booking.status.value == "PendingPayment"
+        assert saved_booking.booking.status == "PendingPayment"
         assert len(saved_booking.booking.tickets) == 2
 
         # Save tickets
@@ -56,7 +56,7 @@ class TestBookingWorkflowIntegration:
 
         # Verify payment
         paid_booking = self.booking_repository.get_by_id(booking_id)
-        assert paid_booking.booking.status.value == "Paid"
+        assert paid_booking.booking.status == "Paid"
         assert paid_booking.booking.payment_reference == payment_ref
 
     def test_expired_booking_workflow(self):
@@ -65,16 +65,16 @@ class TestBookingWorkflowIntegration:
         booking_id = str(uuid.uuid4())
         created_at = datetime.now() - timedelta(minutes=20)
         booking = Booking(
-            booking_id=booking_id,
             customer_id="CUST001",
             event_id="EV001",
             ticket_category_name="Regular",
             quantity=1,
             unit_price=100000.0,
-            total_price=Money(100000.0),
-            payment_deadline_minutes=15,
-            created_at=created_at,
+            total_price=100000.0,
         )
+        booking.booking_id = booking_id
+        # Manually adjust deadline for expiration
+        booking.payment_deadline.deadline = created_at + timedelta(minutes=15)
 
         booking_agg = BookingAggregate(booking)
         booking_agg.create_tickets()
@@ -93,7 +93,7 @@ class TestBookingWorkflowIntegration:
 
         # Verify expiration
         expired_booking = self.booking_repository.get_by_id(booking_id)
-        assert expired_booking.booking.status.value == "Expired"
+        assert expired_booking.booking.status == "Expired"
 
     def test_find_expired_pending_bookings(self):
         """Test finding expired pending bookings."""
@@ -101,30 +101,29 @@ class TestBookingWorkflowIntegration:
         expired_id = str(uuid.uuid4())
         created_at = datetime.now() - timedelta(minutes=20)
         expired_booking = Booking(
-            booking_id=expired_id,
             customer_id="CUST001",
             event_id="EV001",
             ticket_category_name="Regular",
             quantity=1,
             unit_price=100.0,
-            total_price=Money(100.0),
-            payment_deadline_minutes=15,
-            created_at=created_at,
+            total_price=100.0,
         )
+        expired_booking.booking_id = expired_id
+        expired_booking.payment_deadline.deadline = created_at + timedelta(minutes=15)
         expired_agg = BookingAggregate(expired_booking)
         self.booking_repository.save(expired_agg)
 
         # Create active booking
         active_id = str(uuid.uuid4())
         active_booking = Booking(
-            booking_id=active_id,
             customer_id="CUST002",
             event_id="EV002",
             ticket_category_name="VIP",
             quantity=2,
             unit_price=200.0,
-            total_price=Money(400.0),
+            total_price=400.0,
         )
+        active_booking.booking_id = active_id
         active_agg = BookingAggregate(active_booking)
         self.booking_repository.save(active_agg)
 
@@ -138,14 +137,14 @@ class TestBookingWorkflowIntegration:
         # Create booking with tickets
         booking_id = str(uuid.uuid4())
         booking = Booking(
-            booking_id=booking_id,
             customer_id="CUST001",
             event_id="EV001",
             ticket_category_name="VIP",
             quantity=1,
             unit_price=500000.0,
-            total_price=Money(500000.0),
+            total_price=500000.0,
         )
+        booking.booking_id = booking_id
 
         booking_agg = BookingAggregate(booking)
         booking_agg.create_tickets()
@@ -153,14 +152,14 @@ class TestBookingWorkflowIntegration:
         # Save tickets
         for ticket in booking_agg.booking.tickets:
             self.ticket_repository.save(ticket)
-            ticket_code = ticket.ticket_code.code
+            ticket_code = ticket.ticket_code.value
 
         # Check in ticket
-        ticket = self.ticket_repository.get_by_code(ticket_code)
+        ticket = self.ticket_repository.find_by_code(ticket_code)
         ticket.check_in()
         self.ticket_repository.save(ticket)
 
         # Verify check-in
-        checked_in_ticket = self.ticket_repository.get_by_code(ticket_code)
+        checked_in_ticket = self.ticket_repository.find_by_code(ticket_code)
         assert checked_in_ticket.status.value == "CheckedIn"
         assert checked_in_ticket.checked_in_at is not None

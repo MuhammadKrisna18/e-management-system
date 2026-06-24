@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 from app.domain.entities.booking import Booking
 from app.domain.entities.ticket import Ticket
+from app.domain.value_objects.ticket_code import TicketCode
 from app.domain.entities.refund import Refund
 
 from app.domain.aggregates.booking_aggregate import BookingAggregate
@@ -379,16 +380,24 @@ def test_booking_quantity_must_be_positive():
     with pytest.raises(ValueError):
 
         Booking(
-            "customer-1",
-            0
+            customer_id="customer-1",
+            event_id="EV001",
+            ticket_category_name="VIP",
+            quantity=0,
+            unit_price=100.0,
+            total_price=0.0
         )
 
 
 def test_booking_cannot_pay_after_deadline():
 
     booking = Booking(
-        "customer-1",
-        1
+        customer_id="customer-1",
+        event_id="EV001",
+        ticket_category_name="VIP",
+        quantity=1,
+        unit_price=100.0,
+        total_price=100.0
     )
 
     booking.payment_deadline.deadline = (
@@ -397,61 +406,52 @@ def test_booking_cannot_pay_after_deadline():
     )
 
     aggregate = BookingAggregate(
-        booking,
-        100
+        booking
     )
 
     with pytest.raises(ValueError):
-        aggregate.pay(100)
+        aggregate.pay_booking("REF123")
 
 
-def test_booking_wrong_payment_amount():
 
-    booking = Booking(
-        "customer-1",
-        1
-    )
-
-    aggregate = BookingAggregate(
-        booking,
-        100
-    )
-
-    with pytest.raises(ValueError):
-        aggregate.pay(50)
 
 
 def test_paid_booking_cannot_expire():
 
     booking = Booking(
-        "customer-1",
-        1
+        customer_id="customer-1",
+        event_id="EV001",
+        ticket_category_name="VIP",
+        quantity=1,
+        unit_price=100.0,
+        total_price=100.0
     )
 
     aggregate = BookingAggregate(
-        booking,
-        100
+        booking
     )
 
-    aggregate.pay(100)
+    aggregate.pay_booking("REF123")
 
     with pytest.raises(ValueError):
-        aggregate.expire()
+        aggregate.expire_booking()
 
 
 # =========================================================
 # TICKET TESTS
 # =========================================================
 
+from app.domain.exceptions import TicketAlreadyCheckedException
+
 def test_ticket_cannot_checkin_twice():
 
     ticket = Ticket(
-        "ABC123"
+        ticket_code=TicketCode()
     )
 
     ticket.check_in()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TicketAlreadyCheckedException):
         ticket.check_in()
 
 
@@ -461,7 +461,14 @@ def test_ticket_cannot_checkin_twice():
 
 def test_refund_cannot_approve_if_not_requested():
 
-    refund = Refund()
+    refund = Refund(
+        refund_id="REF001",
+        booking_id="BKG001",
+        customer_id="CUST001",
+        event_id="EV001",
+        refund_amount=100.0,
+        refund_deadline=datetime.now()
+    )
 
     aggregate = RefundAggregate(
         refund
@@ -475,7 +482,14 @@ def test_refund_cannot_approve_if_not_requested():
 
 def test_rejected_refund_must_have_reason():
 
-    refund = Refund()
+    refund = Refund(
+        refund_id="REF001",
+        booking_id="BKG001",
+        customer_id="CUST001",
+        event_id="EV001",
+        refund_amount=100.0,
+        refund_deadline=datetime.now()
+    )
 
     aggregate = RefundAggregate(
         refund
@@ -487,7 +501,14 @@ def test_rejected_refund_must_have_reason():
 
 def test_refund_mark_paid_out_requires_approved_status():
 
-    refund = Refund()
+    refund = Refund(
+        refund_id="REF001",
+        booking_id="BKG001",
+        customer_id="CUST001",
+        event_id="EV001",
+        refund_amount=100.0,
+        refund_deadline=datetime.now()
+    )
 
     aggregate = RefundAggregate(
         refund

@@ -16,16 +16,29 @@ class TicketReserved:
         quantity: Number of tickets reserved
     """
     
-    def __init__(self, booking_id: str, quantity: int = 1) -> None:
+    def __init__(
+        self,
+        booking_id: str,
+        event_id: str,
+        ticket_category: str,
+        quantity: int,
+        total_price: float
+    ) -> None:
         """
         Initialize TicketReserved event.
         
         Args:
             booking_id: ID of the booking
+            event_id: ID of the event
+            ticket_category: Name of the ticket category
             quantity: Number of tickets reserved
+            total_price: Total price of the reservation
         """
         self.booking_id: str = booking_id
+        self.event_id: str = event_id
+        self.ticket_category: str = ticket_category
         self.quantity: int = quantity
+        self.total_price: float = total_price
     
     def __str__(self) -> str:
         return f"TicketReserved(booking_id={self.booking_id}, qty={self.quantity})"

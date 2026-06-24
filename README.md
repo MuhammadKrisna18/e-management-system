@@ -26,6 +26,23 @@ Project ini dikembangkan sebagai studi kasus mata kuliah:
 
 ---
 
+# Implemented Features (User Stories)
+- [x] **US 1**: Create Event
+- [x] **US 2**: Publish Event
+- [x] **US 3**: Cancel Event
+- [x] **US 4**: Create Ticket Category
+- [x] **US 5**: Disable Ticket Category
+- [x] **US 6**: View Available Events
+- [x] **US 8**: Create Ticket Booking
+- [x] **US 9**: Calculate Booking Total Price
+- [x] **US 10**: Pay Booking
+- [x] **US 15**: Request Refund
+- [x] **US 16**: Approve Refund
+- [x] **US 18**: Mark Refund as Paid Out
+- [x] **US 19**: View Event Sales Report
+
+---
+
 # Tujuan Project
 
 Project ini bertujuan untuk:

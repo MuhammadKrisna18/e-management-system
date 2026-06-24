@@ -19,6 +19,7 @@ from app.domain.entities.booking import Booking
 from app.application.commands.create_event_command import CreateEventCommand
 from app.application.commands.cancel_event_command import CancelEventCommand
 from app.application.commands.create_ticket_category_command import CreateTicketCategoryCommand
+from app.application.commands.disable_ticket_category_command import DisableTicketCategoryCommand
 from app.application.commands.publish_event_command import PublishEventCommand
 from app.application.commands.create_booking_command import CreateBookingCommand
 from app.application.commands.request_refund_command import RequestRefundCommand
@@ -154,6 +155,7 @@ def main():
     print(f"  Booking ID: {booking_id}")
     print(f"  Customer ID: {customer_id}")
     print(f"  Status: {booking_agg.booking.status}")
+    print(f"  Total Price: Rp {booking_agg.booking.total_price:,.2f}")
     print(f"  Payment deadline: {booking_agg.booking.payment_deadline}")
     print()
 
@@ -270,6 +272,24 @@ def main():
     print(f"  Status: {cancelled_event_agg.event.status}")
     print()
 
+    # ==================== STEP 12: Disable Ticket Category ====================
+    print("STEP 12: Disabling Ticket Category (Demo for US 5)")
+    print("-" * 80)
+    
+    disable_category_handler = container.get_disable_ticket_category_handler()
+    disable_cmd = DisableTicketCategoryCommand(
+        event_id=event_id,
+        category_name="VIP"
+    )
+    disabled_event_agg = disable_category_handler.handle(disable_cmd)
+    
+    print(f"✓ Ticket Category 'VIP' disabled for event {event_id}")
+    for cat in disabled_event_agg.ticket_categories:
+        if cat.name == "VIP":
+            print(f"  Category Name: {cat.name}")
+            print(f"  Active: {cat.is_active}")
+    print()
+
     # ==================== Summary ====================
     print("=" * 80)
     print("Demo Completed Successfully!")
@@ -279,8 +299,10 @@ def main():
     print("✓ Create Event (User Story 1)")
     print("✓ Publish Event (User Story 2)")
     print("✓ Create Ticket Categories (User Story 4)")
+    print("✓ Disable Ticket Category (User Story 5)")
     print("✓ View Available Events (User Story 6)")
     print("✓ Create Ticket Booking (User Story 8)")
+    print("✓ Calculate Booking Total Price (User Story 9)")
     print("✓ Pay Booking (User Story 10)")
     print("✓ Request Refund (User Story 15)")
     print("✓ Approve Refund (User Story 16)")

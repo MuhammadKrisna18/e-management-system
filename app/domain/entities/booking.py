@@ -13,7 +13,9 @@ class Booking:
         customer_id: str,
         event_id: str,
         ticket_category_name: str,
-        quantity: int
+        quantity: int,
+        unit_price: float,
+        total_price: float
     ):
 
         if quantity <= 0:
@@ -25,7 +27,8 @@ class Booking:
         self.event_id = event_id
         self.ticket_category_name = ticket_category_name
         self.quantity = quantity
-        self.total_price = 0.0 # Will be calculated later
+        self.unit_price = unit_price
+        self.total_price = total_price
         self.booking_id = None
         self.tickets = []
 
@@ -45,6 +48,8 @@ class Booking:
     def pay(self, payment_reference: str, paid_at: datetime = None):
         if self.status != "PendingPayment":
             raise ValueError("Can only pay for pending bookings")
+        if self.is_payment_deadline_passed():
+            raise ValueError("Payment deadline has passed")
         self.status = "Paid"
         self.payment_reference = payment_reference
 
@@ -55,3 +60,8 @@ class Booking:
         if self.status != "PendingPayment":
             raise ValueError("Can only expire pending bookings")
         self.status = "Expired"
+
+    def is_payment_deadline_passed(self, current_time: datetime = None) -> bool:
+        if current_time is None:
+            current_time = datetime.now()
+        return current_time > self.payment_deadline.deadline

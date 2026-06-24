@@ -59,7 +59,7 @@ class FakeEventRepository:
     ):
         return self.aggregate
 
-    def get_published_events(
+    def find_published(
         self
     ):
         return [
@@ -98,7 +98,7 @@ def test_create_event_handler():
     )
 
     assert (
-        event.name
+        event.event.name
         == "Tech Conference"
     )
 

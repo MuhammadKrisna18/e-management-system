@@ -40,18 +40,17 @@ class BookingAggregate:
         for i in range(self.booking.quantity):
             ticket_code = TicketCode()
             ticket = Ticket(
-                ticket_code=ticket_code,
-                booking_id=self.booking.booking_id,
-                event_id=self.booking.event_id,
-                ticket_category_name=self.booking.ticket_category_name,
-                price=0.0,
+                ticket_code=ticket_code
             )
             self.booking.add_ticket(ticket)
 
         self.domain_events.append(
             TicketReserved(
                 booking_id=self.booking.booking_id,
+                event_id=self.booking.event_id,
+                ticket_category=self.booking.ticket_category_name,
                 quantity=self.booking.quantity,
+                total_price=self.booking.total_price,
             )
         )
 

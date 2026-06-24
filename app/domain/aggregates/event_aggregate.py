@@ -82,6 +82,9 @@ class EventAggregate:
 
             if category.name == category_name:
                 category.disable()
+                self.domain_events.append(
+                    TicketCategoryDisabled(category.name)
+                )
                 return
 
         raise ValueError("Ticket category not found")

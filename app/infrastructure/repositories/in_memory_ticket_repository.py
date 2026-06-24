@@ -70,8 +70,8 @@ class InMemoryTicketRepository(TicketRepository):
         """
         for ticket in self._tickets.values():
             if (hasattr(ticket, 'ticket_code') and 
-                hasattr(ticket.ticket_code, 'code') and
-                ticket.ticket_code.code == ticket_code):
+                hasattr(ticket.ticket_code, 'value') and
+                ticket.ticket_code.value == ticket_code):
                 return ticket
             # Fallback for simple code attribute
             elif hasattr(ticket, 'code') and ticket.code == ticket_code:
