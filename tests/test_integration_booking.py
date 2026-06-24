@@ -31,33 +31,29 @@ class TestBookingWorkflowIntegration:
             event_id="EV001",
             ticket_category_name="VIP",
             quantity=2,
-            unit_price=500000.0,
-            total_price=1000000.0,
+            unit_price=Money(500000.0),
+            total_price=Money(1000000.0),
         )
         booking.booking_id = booking_id
 
         booking_agg = BookingAggregate(booking)
-        booking_agg.create_tickets()
         self.booking_repository.save(booking_agg)
 
-        # Verify booking created with tickets
+        # Verify booking created without tickets
         saved_booking = self.booking_repository.get_by_id(booking_id)
         assert saved_booking.booking.status == "PendingPayment"
-        assert len(saved_booking.booking.tickets) == 2
-
-        # Save tickets
-        for ticket in saved_booking.booking.tickets:
-            self.ticket_repository.save(ticket)
+        assert len(saved_booking.booking.tickets) == 0
 
         # Pay booking
         payment_ref = "TXN123456"
-        saved_booking.pay_booking(payment_ref)
+        saved_booking.pay_booking(payment_ref, Money(1000000.0))
         self.booking_repository.save(saved_booking)
 
         # Verify payment
         paid_booking = self.booking_repository.get_by_id(booking_id)
         assert paid_booking.booking.status == "Paid"
         assert paid_booking.booking.payment_reference == payment_ref
+        assert len(paid_booking.booking.tickets) == 2
 
     def test_expired_booking_workflow(self):
         """Test booking expiration workflow."""
@@ -69,20 +65,15 @@ class TestBookingWorkflowIntegration:
             event_id="EV001",
             ticket_category_name="Regular",
             quantity=1,
-            unit_price=100000.0,
-            total_price=100000.0,
+            unit_price=Money(100000.0),
+            total_price=Money(100000.0),
         )
         booking.booking_id = booking_id
         # Manually adjust deadline for expiration
         booking.payment_deadline.deadline = created_at + timedelta(minutes=15)
 
         booking_agg = BookingAggregate(booking)
-        booking_agg.create_tickets()
         self.booking_repository.save(booking_agg)
-
-        # Save tickets
-        for ticket in booking_agg.booking.tickets:
-            self.ticket_repository.save(ticket)
 
         # Expire booking
         saved_booking = self.booking_repository.get_by_id(booking_id)
@@ -105,8 +96,8 @@ class TestBookingWorkflowIntegration:
             event_id="EV001",
             ticket_category_name="Regular",
             quantity=1,
-            unit_price=100.0,
-            total_price=100.0,
+            unit_price=Money(100.0),
+            total_price=Money(100.0),
         )
         expired_booking.booking_id = expired_id
         expired_booking.payment_deadline.deadline = created_at + timedelta(minutes=15)
@@ -120,8 +111,8 @@ class TestBookingWorkflowIntegration:
             event_id="EV002",
             ticket_category_name="VIP",
             quantity=2,
-            unit_price=200.0,
-            total_price=400.0,
+            unit_price=Money(200.0),
+            total_price=Money(400.0),
         )
         active_booking.booking_id = active_id
         active_agg = BookingAggregate(active_booking)
@@ -141,13 +132,13 @@ class TestBookingWorkflowIntegration:
             event_id="EV001",
             ticket_category_name="VIP",
             quantity=1,
-            unit_price=500000.0,
-            total_price=500000.0,
+            unit_price=Money(500000.0),
+            total_price=Money(500000.0),
         )
         booking.booking_id = booking_id
 
         booking_agg = BookingAggregate(booking)
-        booking_agg.create_tickets()
+        booking_agg.pay_booking("REF_CHK", Money(500000.0))
 
         # Save tickets
         for ticket in booking_agg.booking.tickets:

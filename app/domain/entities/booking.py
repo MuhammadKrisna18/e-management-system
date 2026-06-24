@@ -4,6 +4,7 @@ from datetime import timedelta
 from app.domain.value_objects.payment_deadline import (
     PaymentDeadline
 )
+from app.domain.value_objects.money import Money
 
 
 class Booking:
@@ -14,8 +15,8 @@ class Booking:
         event_id: str,
         ticket_category_name: str,
         quantity: int,
-        unit_price: float,
-        total_price: float
+        unit_price: Money,
+        total_price: Money
     ):
 
         if quantity <= 0:
@@ -45,11 +46,13 @@ class Booking:
             )
         )
 
-    def pay(self, payment_reference: str, paid_at: datetime = None):
+    def pay(self, payment_reference: str, amount: Money, paid_at: datetime = None):
         if self.status != "PendingPayment":
             raise ValueError("Can only pay for pending bookings")
         if self.is_payment_deadline_passed():
             raise ValueError("Payment deadline has passed")
+        if amount != self.total_price:
+            raise ValueError("Payment amount must equal total booking price")
         self.status = "Paid"
         self.payment_reference = payment_reference
 

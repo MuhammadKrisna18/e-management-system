@@ -19,3 +19,19 @@ class BookingRepository(
         booking_id
     ):
         pass
+
+    @abstractmethod
+    def find_active_by_customer_and_event(
+        self,
+        customer_id: str,
+        event_id: str
+    ):
+        pass
+
+    @abstractmethod
+    def get_booked_quantity_for_category(
+        self,
+        event_id: str,
+        ticket_category_name: str
+    ) -> int:
+        pass

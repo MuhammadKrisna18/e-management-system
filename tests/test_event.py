@@ -12,6 +12,10 @@ from datetime import datetime, timedelta
 from app.domain.entities.booking import Booking
 from app.domain.entities.ticket import Ticket
 from app.domain.value_objects.ticket_code import TicketCode
+from app.domain.value_objects.refund_status import (
+    RefundStatus
+)
+from app.domain.value_objects.money import Money
 from app.domain.entities.refund import Refund
 
 from app.domain.aggregates.booking_aggregate import BookingAggregate
@@ -384,8 +388,8 @@ def test_booking_quantity_must_be_positive():
             event_id="EV001",
             ticket_category_name="VIP",
             quantity=0,
-            unit_price=100.0,
-            total_price=0.0
+            unit_price=Money(100.0),
+            total_price=Money(0.0)
         )
 
 
@@ -410,7 +414,7 @@ def test_booking_cannot_pay_after_deadline():
     )
 
     with pytest.raises(ValueError):
-        aggregate.pay_booking("REF123")
+        aggregate.pay_booking("REF123", Money(100.0))
 
 
 
@@ -423,15 +427,15 @@ def test_paid_booking_cannot_expire():
         event_id="EV001",
         ticket_category_name="VIP",
         quantity=1,
-        unit_price=100.0,
-        total_price=100.0
+        unit_price=Money(100.0),
+        total_price=Money(100.0)
     )
 
     aggregate = BookingAggregate(
         booking
     )
 
-    aggregate.pay_booking("REF123")
+    aggregate.pay_booking("REF123", Money(100.0))
 
     with pytest.raises(ValueError):
         aggregate.expire_booking()

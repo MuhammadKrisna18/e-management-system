@@ -110,6 +110,34 @@ class InMemoryBookingRepository(BookingRepository):
         """
         return list(self._bookings.values())
 
+    def find_active_by_customer_and_event(
+        self,
+        customer_id: str,
+        event_id: str
+    ) -> List[BookingAggregate]:
+        active_bookings = []
+        for agg in self._bookings.values():
+            booking = agg.booking
+            if (booking.customer_id == customer_id and 
+                booking.event_id == event_id and 
+                booking.status in ["PendingPayment", "Paid"]):
+                active_bookings.append(agg)
+        return active_bookings
+
+    def get_booked_quantity_for_category(
+        self,
+        event_id: str,
+        ticket_category_name: str
+    ) -> int:
+        booked_qty = 0
+        for agg in self._bookings.values():
+            booking = agg.booking
+            if (booking.event_id == event_id and 
+                booking.ticket_category_name == ticket_category_name and
+                booking.status in ["PendingPayment", "Paid"]):
+                booked_qty += booking.quantity
+        return booked_qty
+
     def delete(self, booking_id: str) -> bool:
         """
         Delete booking by ID.

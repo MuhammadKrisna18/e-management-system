@@ -24,7 +24,15 @@ class BookingAggregate:
             booking: Booking entity (aggregate root)
         """
         self.booking = booking
-        self.domain_events = []
+        self.domain_events = [
+            TicketReserved(
+                booking_id=self.booking.booking_id,
+                event_id=self.booking.event_id,
+                ticket_category=self.booking.ticket_category_name,
+                quantity=self.booking.quantity,
+                total_price=self.booking.total_price,
+            )
+        ]
 
     def create_tickets(self):
         """
@@ -44,26 +52,19 @@ class BookingAggregate:
             )
             self.booking.add_ticket(ticket)
 
-        self.domain_events.append(
-            TicketReserved(
-                booking_id=self.booking.booking_id,
-                event_id=self.booking.event_id,
-                ticket_category=self.booking.ticket_category_name,
-                quantity=self.booking.quantity,
-                total_price=self.booking.total_price,
-            )
-        )
-
-    def pay_booking(self, payment_reference: str, paid_at: datetime = None):
+    def pay_booking(self, payment_reference: str, amount: 'Money', paid_at: datetime = None):
         """
         Process booking payment.
-        Marks booking as PAID and raises BookingPaid event.
+        Marks booking as PAID, issues tickets, and raises BookingPaid event.
         
         Args:
             payment_reference: Payment transaction reference
             paid_at: Payment timestamp (optional)
         """
-        self.booking.pay(payment_reference, paid_at)
+        self.booking.pay(payment_reference, amount, paid_at)
+        
+        # Issue tickets after payment
+        self.create_tickets()
 
         self.domain_events.append(
             BookingPaid(

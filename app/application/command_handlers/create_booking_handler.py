@@ -1,5 +1,7 @@
+from datetime import datetime
 from app.domain.entities.booking import Booking
 from app.domain.aggregates.booking_aggregate import BookingAggregate
+from app.domain.value_objects.money import Money
 
 class CreateBookingHandler:
 
@@ -32,8 +34,21 @@ class CreateBookingHandler:
         if not ticket_category.is_active:
             raise ValueError(f"Ticket category {command.ticket_category_name} is disabled")
 
-        unit_price = ticket_category.price
-        total_price = unit_price * command.quantity
+        now = datetime.now()
+        if now < ticket_category.sales_start_date or now > ticket_category.sales_end_date:
+            raise ValueError("Booking is only allowed within the ticket sales period")
+
+        booked_qty = self.repository.get_booked_quantity_for_category(command.event_id, command.ticket_category_name)
+        remaining_quota = ticket_category.quota - booked_qty
+        if command.quantity > remaining_quota:
+            raise ValueError("Requested quantity exceeds remaining ticket quota")
+
+        active_bookings = self.repository.find_active_by_customer_and_event(command.customer_id, command.event_id)
+        if len(active_bookings) > 0:
+            raise ValueError("Customer already has an active booking for this event")
+
+        unit_price = Money(ticket_category.price)
+        total_price = unit_price.multiply(command.quantity)
 
         booking = Booking(
             command.customer_id,
