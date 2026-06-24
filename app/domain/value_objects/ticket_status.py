@@ -1,16 +1,7 @@
-"""Ticket Status Value Object"""
 from enum import Enum
 
 
 class TicketStatus(Enum):
-    """
-    Value object representing ticket status.
-    
-    Possible states:
-    - ACTIVE: Ticket is valid and can be used for check-in
-    - CHECKED_IN: Participant has checked in with this ticket
-    - CANCELLED: Ticket has been cancelled (due to refund or event cancellation)
-    """
     
     ACTIVE = "Active"
     CHECKED_IN = "CheckedIn"

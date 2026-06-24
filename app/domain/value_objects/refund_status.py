@@ -1,17 +1,7 @@
-"""Refund Status Value Object"""
 from enum import Enum
 
 
 class RefundStatus(Enum):
-    """
-    Value object representing refund status.
-    
-    Possible states:
-    - REQUESTED: Refund request submitted
-    - APPROVED: Refund request approved by organizer
-    - REJECTED: Refund request rejected by organizer
-    - PAID_OUT: Refund has been processed and paid out to customer
-    """
     
     REQUESTED = "Requested"
     APPROVED = "Approved"

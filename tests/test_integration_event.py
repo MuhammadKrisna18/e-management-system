@@ -1,4 +1,3 @@
-"""Integration Tests for Event Management"""
 import pytest
 from datetime import datetime, timedelta
 from app.domain.aggregates.event_aggregate import EventAggregate
@@ -10,14 +9,11 @@ from app.infrastructure.repositories.in_memory_event_repository import (
 
 
 class TestEventManagementIntegration:
-    """Integration tests for event management workflow."""
 
     def setup_method(self):
-        """Setup test fixtures."""
         self.event_repository = InMemoryEventRepository()
 
     def test_create_and_publish_event_workflow(self):
-        """Test complete event creation and publishing workflow."""
         # Create event
         event = Event(
             name="Tech Conference 2026",
@@ -66,7 +62,6 @@ class TestEventManagementIntegration:
         assert len(published_event.ticket_categories) == 2
 
     def test_event_cannot_publish_without_ticket_category(self):
-        """Test that event cannot be published without ticket categories."""
         event = Event(
             name="Invalid Event",
             start_date=datetime(2026, 10, 1),
@@ -80,7 +75,6 @@ class TestEventManagementIntegration:
             aggregate.publish()
 
     def test_find_published_events(self):
-        """Test finding published events."""
         # Create and publish first event
         event1 = Event(
             name="Event 1",
@@ -116,7 +110,6 @@ class TestEventManagementIntegration:
         assert published[0].event.name == "Event 1"
 
     def test_cancel_event_disables_all_categories(self):
-        """Test that cancelling event disables all ticket categories."""
         event = Event(
             name="Event to Cancel",
             start_date=datetime(2026, 9, 1),

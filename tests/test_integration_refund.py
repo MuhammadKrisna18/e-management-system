@@ -1,4 +1,3 @@
-"""Integration Tests for Refund Workflow"""
 import pytest
 import uuid
 from datetime import datetime, timedelta
@@ -12,14 +11,11 @@ from app.infrastructure.repositories.in_memory_refund_repository import (
 
 
 class TestRefundWorkflowIntegration:
-    """Integration tests for complete refund workflow."""
 
     def setup_method(self):
-        """Setup test fixtures."""
         self.refund_repository = InMemoryRefundRepository()
 
     def test_complete_refund_approval_workflow(self):
-        """Test complete refund approval workflow."""
         # Request refund
         refund_id = str(uuid.uuid4())
         refund_deadline = datetime.now() + timedelta(days=7)
@@ -60,7 +56,6 @@ class TestRefundWorkflowIntegration:
         assert paid_refund.refund.paid_out_at is not None
 
     def test_refund_rejection_workflow(self):
-        """Test refund rejection workflow."""
         # Request refund
         refund_id = str(uuid.uuid4())
         refund = Refund(
@@ -88,7 +83,6 @@ class TestRefundWorkflowIntegration:
         assert rejected_refund.refund.rejected_at is not None
 
     def test_find_refund_by_booking(self):
-        """Test finding refund by booking ID."""
         # Create refund for booking
         refund_id = str(uuid.uuid4())
         booking_id = "BK003"
@@ -110,7 +104,6 @@ class TestRefundWorkflowIntegration:
         assert found_refund.refund.refund_id == refund_id
 
     def test_find_approved_pending_payout_refunds(self):
-        """Test finding approved refunds pending payout."""
         # Create approved refund
         approved_id = str(uuid.uuid4())
         approved_refund = Refund(
@@ -146,7 +139,6 @@ class TestRefundWorkflowIntegration:
         assert pending[0].refund.refund_id == approved_id
 
     def test_find_customer_refunds(self):
-        """Test finding all refunds for a customer."""
         customer_id = "CUST006"
 
         # Create multiple refunds
@@ -168,7 +160,6 @@ class TestRefundWorkflowIntegration:
         assert len(customer_refunds) == 3
 
     def test_refund_expiration_check(self):
-        """Test refund deadline expiration check."""
         # Create refund with past deadline
         refund_deadline = datetime.now() - timedelta(days=1)
         refund = Refund(

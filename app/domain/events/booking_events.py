@@ -1,20 +1,8 @@
-"""
-Booking Domain Events
-
-Events raised during booking lifecycle.
-"""
 
 from typing import Optional
 
 
 class TicketReserved:
-    """
-    Event raised when ticket is successfully reserved in a booking.
-    
-    Attributes:
-        booking_id: ID of the booking
-        quantity: Number of tickets reserved
-    """
     
     def __init__(
         self,
@@ -24,16 +12,6 @@ class TicketReserved:
         quantity: int,
         total_price: float
     ) -> None:
-        """
-        Initialize TicketReserved event.
-        
-        Args:
-            booking_id: ID of the booking
-            event_id: ID of the event
-            ticket_category: Name of the ticket category
-            quantity: Number of tickets reserved
-            total_price: Total price of the reservation
-        """
         self.booking_id: str = booking_id
         self.event_id: str = event_id
         self.ticket_category: str = ticket_category
@@ -48,14 +26,6 @@ class TicketReserved:
 
 
 class BookingPaid:
-    """
-    Event raised when booking payment is completed.
-    
-    Attributes:
-        booking_id: ID of the booking
-        amount: Payment amount
-        payment_reference: Reference from payment gateway
-    """
     
     def __init__(
         self,
@@ -63,14 +33,6 @@ class BookingPaid:
         amount: float,
         payment_reference: Optional[str] = None
     ) -> None:
-        """
-        Initialize BookingPaid event.
-        
-        Args:
-            booking_id: ID of the booking
-            amount: Payment amount
-            payment_reference: Reference from payment gateway
-        """
         self.booking_id: str = booking_id
         self.amount: float = amount
         self.payment_reference: Optional[str] = payment_reference
@@ -83,20 +45,8 @@ class BookingPaid:
 
 
 class BookingExpired:
-    """
-    Event raised when booking payment deadline passes.
-    
-    Attributes:
-        booking_id: ID of the booking
-    """
     
     def __init__(self, booking_id: str) -> None:
-        """
-        Initialize BookingExpired event.
-        
-        Args:
-            booking_id: ID of the booking
-        """
         self.booking_id: str = booking_id
     
     def __str__(self) -> str:

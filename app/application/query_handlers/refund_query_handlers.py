@@ -1,4 +1,3 @@
-"""Query Handlers for Refund Queries"""
 from math import ceil
 from app.application.queries.refund_queries import (
     GetRefundDetailsQuery,
@@ -15,33 +14,11 @@ from app.domain.repositories.refund_repository import RefundRepository
 
 
 class GetRefundDetailsQueryHandler:
-    """
-    Handler for GetRefundDetailsQuery.
-    Retrieves detailed information about a specific refund (US15).
-    """
 
     def __init__(self, refund_repository: RefundRepository):
-        """
-        Initialize handler with refund repository.
-        
-        Args:
-            refund_repository: RefundRepository instance
-        """
         self.refund_repository = refund_repository
 
     def handle(self, query: GetRefundDetailsQuery) -> RefundDetailResponse:
-        """
-        Handle GetRefundDetailsQuery.
-        
-        Args:
-            query: GetRefundDetailsQuery with refund_id
-            
-        Returns:
-            RefundDetailResponse: Refund details
-            
-        Raises:
-            ValueError: If refund not found
-        """
         refund_agg = self.refund_repository.get_by_id(query.refund_id)
         if not refund_agg:
             raise ValueError(f"Refund {query.refund_id} not found")
@@ -66,30 +43,11 @@ class GetRefundDetailsQueryHandler:
 
 
 class GetCustomerRefundsQueryHandler:
-    """
-    Handler for GetCustomerRefundsQuery.
-    Retrieves all refunds for a customer with pagination (US15).
-    """
 
     def __init__(self, refund_repository: RefundRepository):
-        """
-        Initialize handler with refund repository.
-        
-        Args:
-            refund_repository: RefundRepository instance
-        """
         self.refund_repository = refund_repository
 
     def handle(self, query: GetCustomerRefundsQuery) -> RefundListResponse:
-        """
-        Handle GetCustomerRefundsQuery.
-        
-        Args:
-            query: GetCustomerRefundsQuery with customer_id
-            
-        Returns:
-            RefundListResponse: Paginated list of refunds
-        """
         # Get all refunds for customer
         refund_aggs = self.refund_repository.find_by_customer(query.customer_id)
 
@@ -122,33 +80,11 @@ class GetCustomerRefundsQueryHandler:
 
 
 class GetRefundByBookingQueryHandler:
-    """
-    Handler for GetRefundByBookingQuery.
-    Retrieves refund for a specific booking.
-    """
 
     def __init__(self, refund_repository: RefundRepository):
-        """
-        Initialize handler with refund repository.
-        
-        Args:
-            refund_repository: RefundRepository instance
-        """
         self.refund_repository = refund_repository
 
     def handle(self, query: GetRefundByBookingQuery) -> RefundDetailResponse:
-        """
-        Handle GetRefundByBookingQuery.
-        
-        Args:
-            query: GetRefundByBookingQuery with booking_id
-            
-        Returns:
-            RefundDetailResponse: Refund details
-            
-        Raises:
-            ValueError: If refund not found
-        """
         refund_agg = self.refund_repository.find_by_booking(query.booking_id)
         if not refund_agg:
             raise ValueError(f"No refund found for booking {query.booking_id}")
@@ -173,30 +109,11 @@ class GetRefundByBookingQueryHandler:
 
 
 class GetApprovedRefundsQueryHandler:
-    """
-    Handler for GetApprovedRefundsQuery.
-    Retrieves approved refunds pending payout (US18).
-    """
 
     def __init__(self, refund_repository: RefundRepository):
-        """
-        Initialize handler with refund repository.
-        
-        Args:
-            refund_repository: RefundRepository instance
-        """
         self.refund_repository = refund_repository
 
     def handle(self, query: GetApprovedRefundsQuery) -> RefundListResponse:
-        """
-        Handle GetApprovedRefundsQuery.
-        
-        Args:
-            query: GetApprovedRefundsQuery with pagination
-            
-        Returns:
-            RefundListResponse: Paginated list of approved refunds
-        """
         # Get approved refunds pending payout
         refund_aggs = self.refund_repository.find_approved_pending_payout()
 

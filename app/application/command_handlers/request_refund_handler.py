@@ -1,4 +1,3 @@
-"""Request Refund Command Handler"""
 import uuid
 from datetime import datetime, timedelta
 from app.domain.entities.refund import Refund
@@ -9,43 +8,16 @@ from app.domain.repositories.refund_repository import RefundRepository
 
 
 class RequestRefundHandler:
-    """
-    Handler for RequestRefundCommand.
-    Implements User Story 15: Request Refund
-    
-    A customer can request a refund for a paid booking before the refund deadline.
-    The refund cannot be requested if any ticket has been checked in.
-    """
 
     def __init__(
         self,
         booking_repository: BookingRepository,
         refund_repository: RefundRepository
     ):
-        """
-        Initialize handler with required repositories.
-        
-        Args:
-            booking_repository: BookingRepository instance
-            refund_repository: RefundRepository instance
-        """
         self.booking_repository = booking_repository
         self.refund_repository = refund_repository
 
     def handle(self, command) -> str:
-        """
-        Handle RequestRefundCommand.
-        
-        Args:
-            command: RequestRefundCommand with booking_id
-            
-        Returns:
-            str: Created refund ID
-            
-        Raises:
-            ValueError: If booking not found, not paid, ticket checked in,
-                       or refund deadline passed
-        """
         # Get booking
         booking_agg = self.booking_repository.get_by_id(command.booking_id)
         if not booking_agg:

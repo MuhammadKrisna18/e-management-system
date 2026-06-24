@@ -1,11 +1,9 @@
-"""Event Report DTOs (Data Transfer Objects)"""
 from typing import Dict, List, Optional
 from dataclasses import dataclass, field
 
 
 @dataclass
 class CategorySalesDto:
-    """DTO for ticket category sales data"""
     
     category_name: str
     quota: int
@@ -16,7 +14,6 @@ class CategorySalesDto:
 
 @dataclass
 class BookingStatsDto:
-    """DTO for booking statistics"""
     
     pending_payment: int
     paid: int
@@ -26,7 +23,6 @@ class BookingStatsDto:
 
 @dataclass
 class EventSalesReportResponse:
-    """Response DTO for event sales report"""
     
     event_id: str
     event_name: str
@@ -38,7 +34,6 @@ class EventSalesReportResponse:
 
 @dataclass
 class ParticipantDto:
-    """DTO for participant information"""
     
     customer_id: str
     ticket_category: str
@@ -49,7 +44,6 @@ class ParticipantDto:
 
 @dataclass
 class EventParticipantsResponse:
-    """Response DTO for event participants list"""
     
     event_id: str
     event_name: str

@@ -1,4 +1,3 @@
-"""Query Handlers for Event Reports and Analytics"""
 from math import ceil
 from datetime import datetime
 from app.application.queries.event_queries import (
@@ -19,10 +18,6 @@ from app.domain.value_objects.booking_status import BookingStatus
 
 
 class GetEventSalesReportQueryHandler:
-    """
-    Handler for GetEventSalesReportQuery.
-    Generates sales report for an event including category sales and revenue (US19).
-    """
 
     def __init__(
         self,
@@ -30,31 +25,11 @@ class GetEventSalesReportQueryHandler:
         booking_repository: BookingRepository,
         ticket_repository: TicketRepository,
     ):
-        """
-        Initialize handler with required repositories.
-        
-        Args:
-            event_repository: EventRepository instance
-            booking_repository: BookingRepository instance
-            ticket_repository: TicketRepository instance
-        """
         self.event_repository = event_repository
         self.booking_repository = booking_repository
         self.ticket_repository = ticket_repository
 
     def handle(self, query: GetEventSalesReportQuery) -> EventSalesReportResponse:
-        """
-        Handle GetEventSalesReportQuery.
-        
-        Args:
-            query: GetEventSalesReportQuery with event_id
-            
-        Returns:
-            EventSalesReportResponse: Sales report containing category sales, booking stats, and revenue
-            
-        Raises:
-            ValueError: If event not found
-        """
         event_agg = self.event_repository.get_by_id(query.event_id)
         if not event_agg:
             raise ValueError(f"Event {query.event_id} not found")
@@ -72,16 +47,6 @@ class GetEventSalesReportQueryHandler:
         )
 
     def _calculate_category_sales(self, event_agg, event_id: str) -> list:
-        """
-        Calculate sales for each ticket category.
-        
-        Args:
-            event_agg: EventAggregate instance
-            event_id: Event identifier
-            
-        Returns:
-            list: Category sales information
-        """
         category_sales = []
         
         # Initialize all categories
@@ -123,15 +88,6 @@ class GetEventSalesReportQueryHandler:
         return category_sales
 
     def _calculate_booking_stats(self, event_id: str) -> tuple:
-        """
-        Calculate booking statistics and total revenue.
-        
-        Args:
-            event_id: Event identifier
-            
-        Returns:
-            tuple: (booking_stats BookingStatsDto, total_revenue float)
-        """
         pending_payment = 0
         paid = 0
         expired = 0
@@ -165,10 +121,6 @@ class GetEventSalesReportQueryHandler:
 
 
 class GetEventParticipantsQueryHandler:
-    """
-    Handler for GetEventParticipantsQuery.
-    Retrieves participant list for an event with check-in status (US20).
-    """
 
     def __init__(
         self,
@@ -176,31 +128,11 @@ class GetEventParticipantsQueryHandler:
         booking_repository: BookingRepository,
         ticket_repository: TicketRepository,
     ):
-        """
-        Initialize handler with required repositories.
-        
-        Args:
-            event_repository: EventRepository instance
-            booking_repository: BookingRepository instance
-            ticket_repository: TicketRepository instance
-        """
         self.event_repository = event_repository
         self.booking_repository = booking_repository
         self.ticket_repository = ticket_repository
 
     def handle(self, query: GetEventParticipantsQuery) -> EventParticipantsResponse:
-        """
-        Handle GetEventParticipantsQuery.
-        
-        Args:
-            query: GetEventParticipantsQuery with event_id and pagination
-            
-        Returns:
-            EventParticipantsResponse: Participant list with pagination info
-            
-        Raises:
-            ValueError: If event not found
-        """
         event_agg = self.event_repository.get_by_id(query.event_id)
         if not event_agg:
             raise ValueError(f"Event {query.event_id} not found")
@@ -222,15 +154,6 @@ class GetEventParticipantsQueryHandler:
         )
 
     def _collect_participants(self, event_id: str) -> list:
-        """
-        Collect all participants for event from paid bookings.
-        
-        Args:
-            event_id: Event identifier
-            
-        Returns:
-            list: List of ParticipantDto records
-        """
         participants = []
 
         for booking_agg in self.booking_repository.find_all():
@@ -266,17 +189,6 @@ class GetEventParticipantsQueryHandler:
         return participants
 
     def _paginate_results(self, items: list, page: int, page_size: int) -> list:
-        """
-        Paginate results.
-        
-        Args:
-            items: List of items to paginate
-            page: Page number (1-based)
-            page_size: Items per page
-            
-        Returns:
-            list: Paginated items
-        """
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size
         return items[start_idx:end_idx]

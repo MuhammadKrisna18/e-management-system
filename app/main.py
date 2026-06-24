@@ -1,9 +1,3 @@
-"""
-Application Entry Point
-
-Demonstrates complete workflow of the Event Ticketing & Booking System.
-Shows how to use commands, queries, handlers, and the dependency container.
-"""
 
 from datetime import datetime, timedelta
 import uuid
@@ -32,16 +26,6 @@ from app.application.queries.event_queries import GetEventSalesReportQuery
 
 
 def main():
-    """
-    Main application demonstration.
-    
-    Shows:
-    1. Creating and publishing an event
-    2. Browsing available events
-    3. Creating and paying for bookings
-    4. Requesting and approving refunds
-    5. Viewing reports
-    """
     
     print("=" * 80)
     print("Event Ticketing & Booking System - Week 12 Infrastructure Demo")

@@ -1,13 +1,6 @@
-"""
-Domain Constants
-
-Centralized constants for the event ticketing system.
-Eliminates magic numbers and strings throughout codebase.
-"""
 
 
 class TimeConstants:
-    """Time-related constants."""
     
     PAYMENT_DEADLINE_MINUTES = 15
     """Minutes to complete payment after booking creation."""
@@ -20,7 +13,6 @@ class TimeConstants:
 
 
 class ErrorMessages:
-    """Error and validation messages."""
     
     # Refund Errors
     REFUND_NOT_FOUND = "Refund {refund_id} not found"
@@ -52,7 +44,6 @@ class ErrorMessages:
 
 
 class ValidationMessages:
-    """Validation-specific messages."""
     
     QUANTITY_TOO_HIGH = "Quantity must not exceed remaining ticket quota"
     QUOTA_EXCEEDS_CAPACITY = "Total quota exceeds event capacity"
@@ -63,7 +54,6 @@ class ValidationMessages:
 
 
 class EventStatus:
-    """Event status constants."""
     
     DRAFT = "Draft"
     PUBLISHED = "Published"
@@ -72,7 +62,6 @@ class EventStatus:
 
 
 class BookingStatuses:
-    """Booking status constants."""
     
     PENDING_PAYMENT = "PendingPayment"
     PAID = "Paid"
@@ -81,7 +70,6 @@ class BookingStatuses:
 
 
 class RefundStatuses:
-    """Refund status constants."""
     
     REQUESTED = "Requested"
     APPROVED = "Approved"
@@ -90,7 +78,6 @@ class RefundStatuses:
 
 
 class TicketStatuses:
-    """Ticket status constants."""
     
     ACTIVE = "Active"
     CHECKED_IN = "CheckedIn"
@@ -98,14 +85,12 @@ class TicketStatuses:
 
 
 class TicketCategoryStatus:
-    """Ticket category status constants."""
     
     ACTIVE = "Active"
     INACTIVE = "Inactive"
 
 
 class ServiceFee:
-    """Service fee configuration."""
     
     PERCENTAGE = 0.05
     """Percentage-based service fee (5% default)."""

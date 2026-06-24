@@ -62,6 +62,8 @@ class Booking:
     def expire(self):
         if self.status != "PendingPayment":
             raise ValueError("Can only expire pending bookings")
+        if not self.is_payment_deadline_passed():
+            raise ValueError("Cannot expire booking: Payment deadline has not passed")
         self.status = "Expired"
 
     def is_payment_deadline_passed(self, current_time: datetime = None) -> bool:

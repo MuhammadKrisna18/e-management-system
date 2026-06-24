@@ -450,7 +450,8 @@ from app.domain.exceptions import TicketAlreadyCheckedException
 def test_ticket_cannot_checkin_twice():
 
     ticket = Ticket(
-        ticket_code=TicketCode()
+        ticket_code=TicketCode(),
+        event_id="EV001"
     )
 
     ticket.check_in()

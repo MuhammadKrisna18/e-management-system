@@ -1,4 +1,3 @@
-"""Refund DTOs (Data Transfer Objects)"""
 from typing import Optional, List
 from dataclasses import dataclass
 from datetime import datetime
@@ -6,7 +5,6 @@ from datetime import datetime
 
 @dataclass
 class RefundDetailResponse:
-    """Response DTO for refund details"""
     
     refund_id: str
     booking_id: str
@@ -25,7 +23,6 @@ class RefundDetailResponse:
 
 @dataclass
 class RefundSummaryResponse:
-    """Response DTO for refund summary in a list"""
     
     refund_id: str
     booking_id: str
@@ -36,7 +33,6 @@ class RefundSummaryResponse:
 
 @dataclass
 class RefundListResponse:
-    """Response DTO for list of refunds"""
     
     items: List[RefundSummaryResponse]
     total: int
@@ -47,7 +43,6 @@ class RefundListResponse:
 
 @dataclass
 class RefundActionResponse:
-    """Response DTO for refund action (approve/reject/payout)"""
     
     refund_id: str
     status: str
@@ -57,21 +52,18 @@ class RefundActionResponse:
 
 @dataclass
 class RefundRequestInput:
-    """Input DTO for requesting a refund"""
     
     booking_id: str
 
 
 @dataclass
 class RefundApprovalInput:
-    """Input DTO for approving a refund"""
     
     refund_id: str
 
 
 @dataclass
 class RefundRejectionInput:
-    """Input DTO for rejecting a refund"""
     
     refund_id: str
     reason: str
@@ -79,7 +71,6 @@ class RefundRejectionInput:
 
 @dataclass
 class RefundPayoutInput:
-    """Input DTO for marking refund as paid out"""
     
     refund_id: str
     payment_reference: str
