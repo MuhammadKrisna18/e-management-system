@@ -33,13 +33,20 @@ Project ini dikembangkan sebagai studi kasus mata kuliah:
 - [x] **US 4**: Create Ticket Category
 - [x] **US 5**: Disable Ticket Category
 - [x] **US 6**: View Available Events
+- [x] **US 7**: View Event Details
 - [x] **US 8**: Create Ticket Booking
 - [x] **US 9**: Calculate Booking Total Price
 - [x] **US 10**: Pay Booking
+- [x] **US 11**: Expire Booking
+- [x] **US 12**: View Purchased Tickets
+- [x] **US 13**: Check In Ticket
+- [x] **US 14**: Reject Invalid Ticket Check-in
 - [x] **US 15**: Request Refund
 - [x] **US 16**: Approve Refund
+- [x] **US 17**: Reject Refund
 - [x] **US 18**: Mark Refund as Paid Out
 - [x] **US 19**: View Event Sales Report
+- [x] **US 20**: View Event Participants
 
 ---
 

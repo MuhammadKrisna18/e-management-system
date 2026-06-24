@@ -524,3 +524,55 @@ def test_refund_mark_paid_out_requires_approved_status():
         aggregate.mark_paid_out(
             "REF123"
         )
+
+def test_booking_cannot_pay_with_incorrect_payment_amount():
+    booking = Booking(
+        customer_id="customer-1",
+        event_id="EV001",
+        ticket_category_name="VIP",
+        quantity=1,
+        unit_price=Money(100.0),
+        total_price=Money(100.0)
+    )
+    aggregate = BookingAggregate(booking)
+    
+    with pytest.raises(ValueError):
+        aggregate.pay_booking("REF123", Money(50.0))
+
+def test_refund_cannot_be_requested_if_ticket_has_already_been_checked_in():
+    from app.application.command_handlers.request_refund_handler import RequestRefundHandler
+    from app.application.commands.request_refund_command import RequestRefundCommand
+    from app.infrastructure.repositories.in_memory_booking_repository import InMemoryBookingRepository
+    from app.infrastructure.repositories.in_memory_refund_repository import InMemoryRefundRepository
+    from app.domain.entities.ticket import Ticket
+    from app.domain.value_objects.ticket_code import TicketCode
+    from app.domain.constants import TicketStatuses
+
+    booking_repo = InMemoryBookingRepository()
+    refund_repo = InMemoryRefundRepository()
+
+    booking = Booking(
+        customer_id="customer-1",
+        event_id="EV001",
+        ticket_category_name="VIP",
+        quantity=1,
+        unit_price=Money(100.0),
+        total_price=Money(100.0)
+    )
+    booking.booking_id = "BKG001"
+    booking.status = "Paid"
+
+    # Add a checked-in ticket
+    ticket = Ticket(ticket_code=TicketCode(), event_id="EV001")
+    ticket.booking_id = "BKG001"
+    ticket.status = TicketStatuses.CHECKED_IN
+    booking.add_ticket(ticket)
+
+    booking_repo.save(BookingAggregate(booking))
+
+    handler = RequestRefundHandler(booking_repo, refund_repo)
+    command = RequestRefundCommand(booking_id="BKG001")
+
+    with pytest.raises(ValueError) as exc:
+        handler.handle(command)
+    assert "Refund cannot be requested if ticket has already been checked in" in str(exc.value)
