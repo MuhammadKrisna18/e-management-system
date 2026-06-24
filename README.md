@@ -26,6 +26,16 @@ Project ini dikembangkan sebagai studi kasus mata kuliah:
 
 ---
 
+# Project Progress
+
+- [x] **Week 8:** Project Structure (Clean Architecture, DDD, Ubiquitous Language)
+- [x] **Week 9-10:** Domain Layer & Unit Tests (Aggregates, Entities, Repositories, Tests)
+- [x] **Week 11:** Application Layer (Commands, Queries, DTOs, Handlers)
+- [x] **Week 12:** Infrastructure Layer (PostgreSQL, Alembic, Repositories, Mock Services)
+- [ ] **Week 13:** Presentation Layer (FastAPI Controllers, Endpoints, Integrations)
+
+---
+
 # Implemented Features (User Stories)
 - [x] **US 1**: Create Event
 - [x] **US 2**: Publish Event
