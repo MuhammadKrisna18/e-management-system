@@ -329,21 +329,22 @@ Interface external service yang direncanakan:
 
 | Term | Meaning |
 |---|---|
-| Event | Aktivitas yang dibuat organizer |
-| Event Organizer | User yang mengelola event |
-| Customer | User yang membeli tiket |
-| Gate Officer | User yang memvalidasi tiket |
-| Ticket Category | Jenis tiket seperti VIP atau Regular |
-| Booking | Reservasi tiket sementara |
-| PendingPayment | Menunggu pembayaran |
-| Paid | Pembayaran berhasil |
-| Expired | Payment deadline terlewati |
-| Ticket | Bukti kehadiran |
-| Ticket Code | Kode unik tiket |
-| Check-in | Proses validasi tiket |
-| Refund | Pengembalian uang |
-| Money | Value object nominal uang |
-| Sales Period | Masa penjualan tiket |
-| Payment Deadline | Deadline pembayaran |
+| Event | An activity organized by an Event Organizer and attended by customers. |
+| Event Organizer | A user who creates and manages events. |
+| Customer | A user who books and purchases tickets. |
+| Gate Officer | A user who validates tickets during event check-in. |
+| Ticket Category | A type of ticket, such as Regular, VIP, or Early Bird. |
+| Quota | The maximum number of tickets available in a ticket category. |
+| Booking | A temporary reservation before payment is completed. |
+| Pending Payment | A booking status indicating that payment has not been completed. |
+| Paid | A booking status indicating that payment has been completed. |
+| Expired | A booking status indicating that the payment deadline has passed. |
+| Ticket | Proof of attendance generated after a booking is paid. |
+| Ticket Code | A unique code used to identify and validate a ticket. |
+| Check-in | The process of validating a ticket when a participant enters the event venue. |
+| Refund | The process of returning money to a customer. |
+| Money | A value object representing an amount and currency. |
+| Sales Period | The period during which a ticket category can be purchased. |
+| Payment Deadline | The deadline for completing payment after a booking is created. |
 
 ---
