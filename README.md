@@ -36,6 +36,127 @@ Project ini dikembangkan sebagai studi kasus mata kuliah:
 
 ---
 
+# Developer Guide
+
+## 1. Configure PostgreSQL
+1. Buat file `.env` di *root directory*.
+2. Isi dengan format koneksi PostgreSQL milikmu:
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/e_management_db
+```
+
+## 2. Run Database Migrations
+Untuk membuat skema tabel otomatis di database PostgreSQL, jalankan:
+```bash
+alembic upgrade head
+```
+
+## 3. Run Unit & Integration Tests
+Untuk menjalankan seluruh 64 tes *business rules* dan arsitektur, jalankan perintah:
+```bash
+pytest tests/ -v
+```
+
+---
+
+# Architecture & Design
+
+## Clean Architecture Diagram
+```mermaid
+graph TD
+    subgraph Presentation Layer
+        A[FastAPI / Controllers] --> B[Application Layer]
+    end
+    
+    subgraph Application Layer
+        B -->|Commands / Queries| C[Command & Query Handlers]
+        C -->|Uses| D[Domain Layer]
+        C -->|Calls| E[Repository Interfaces]
+    end
+    
+    subgraph Domain Layer
+        D[Aggregates, Entities, Value Objects]
+    end
+    
+    subgraph Infrastructure Layer
+        F[Postgres Repositories] -.->|Implements| E
+        F -->|Reads / Writes| G[(PostgreSQL)]
+    end
+```
+
+## Domain Model Diagram
+```mermaid
+classDiagram
+    class EventAggregate {
+        +Event event
+        +List~TicketCategory~ ticket_categories
+        +create_event()
+        +publish()
+        +cancel()
+    }
+    class Event {
+        +String event_id
+        +String name
+        +DateTime start_date
+        +DateTime end_date
+        +int capacity
+        +String status
+    }
+    class TicketCategory {
+        +String name
+        +Money price
+        +int quota
+        +DateTime sales_start_date
+        +DateTime sales_end_date
+    }
+    
+    class BookingAggregate {
+        +Booking booking
+        +List~Ticket~ tickets
+        +reserve_ticket()
+        +pay_booking()
+        +expire()
+    }
+    class Booking {
+        +String booking_id
+        +String event_id
+        +String customer_id
+        +Money total_price
+        +String status
+        +PaymentDeadline deadline
+    }
+    class Ticket {
+        +TicketCode code
+        +String category_name
+        +String status
+        +check_in()
+    }
+    
+    class RefundAggregate {
+        +Refund refund
+        +request_refund()
+        +approve()
+        +reject()
+    }
+    class Refund {
+        +String refund_id
+        +String booking_id
+        +Money amount
+        +String status
+        +String rejection_reason
+    }
+
+    EventAggregate --> Event
+    EventAggregate "1" *-- "*" TicketCategory
+    
+    BookingAggregate --> Booking
+    BookingAggregate "1" *-- "*" Ticket
+    
+    RefundAggregate --> Refund
+```
+
+---
+
 # Implemented Features (User Stories)
 - [x] **US 1**: Create Event
 - [x] **US 2**: Publish Event
