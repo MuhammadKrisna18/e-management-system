@@ -1,6 +1,6 @@
 """Mock Refund Payment Service Implementation"""
 from typing import Dict
-from app.application.services.refund_payment_service import RefundPaymentService
+from app.application.interfaces.refund_payment_service import RefundPaymentService
 
 
 class MockRefundPaymentService(RefundPaymentService):
@@ -13,6 +13,11 @@ class MockRefundPaymentService(RefundPaymentService):
         """Initialize mock service with refund transaction tracking."""
         self._refund_transactions: Dict[str, dict] = {}
         self._transaction_counter = 0
+
+    def transfer(self, amount: float):
+        """Implement RefundPaymentService interface."""
+        # Just process dummy refund
+        self.process_refund("dummy_account", amount, "dummy_ref")
 
     def process_refund(
         self, 

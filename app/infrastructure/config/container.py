@@ -32,6 +32,12 @@ from app.infrastructure.external_services.mock_notification_service import (
 from app.application.command_handlers.create_event_handler import (
     CreateEventHandler
 )
+from app.application.command_handlers.cancel_event_handler import (
+    CancelEventHandler
+)
+from app.application.command_handlers.create_ticket_category_handler import (
+    CreateTicketCategoryHandler
+)
 from app.application.command_handlers.publish_event_handler import (
     PublishEventHandler
 )
@@ -95,6 +101,8 @@ class Container:
 
         # Initialize command handlers (created on demand)
         self._create_event_handler = None
+        self._cancel_event_handler = None
+        self._create_ticket_category_handler = None
         self._publish_event_handler = None
         self._create_booking_handler = None
         self._pay_booking_handler = None
@@ -119,6 +127,18 @@ class Container:
         if self._create_event_handler is None:
             self._create_event_handler = CreateEventHandler(self.event_repository)
         return self._create_event_handler
+
+    def get_cancel_event_handler(self) -> CancelEventHandler:
+        """Get CancelEventHandler instance."""
+        if self._cancel_event_handler is None:
+            self._cancel_event_handler = CancelEventHandler(self.event_repository)
+        return self._cancel_event_handler
+
+    def get_create_ticket_category_handler(self) -> CreateTicketCategoryHandler:
+        """Get CreateTicketCategoryHandler instance."""
+        if self._create_ticket_category_handler is None:
+            self._create_ticket_category_handler = CreateTicketCategoryHandler(self.event_repository)
+        return self._create_ticket_category_handler
 
     def get_publish_event_handler(self) -> PublishEventHandler:
         """Get PublishEventHandler instance."""
@@ -255,6 +275,8 @@ class Container:
     def reset_handlers(self):
         """Reset all cached handler instances."""
         self._create_event_handler = None
+        self._cancel_event_handler = None
+        self._create_ticket_category_handler = None
         self._publish_event_handler = None
         self._create_booking_handler = None
         self._pay_booking_handler = None

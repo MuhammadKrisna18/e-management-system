@@ -17,6 +17,8 @@ from app.domain.aggregates.booking_aggregate import BookingAggregate
 from app.domain.entities.booking import Booking
 
 from app.application.commands.create_event_command import CreateEventCommand
+from app.application.commands.cancel_event_command import CancelEventCommand
+from app.application.commands.create_ticket_category_command import CreateTicketCategoryCommand
 from app.application.commands.publish_event_command import PublishEventCommand
 from app.application.commands.create_booking_command import CreateBookingCommand
 from app.application.commands.request_refund_command import RequestRefundCommand
@@ -55,13 +57,10 @@ def main():
     create_event_handler = container.get_create_event_handler()
     
     event_cmd = CreateEventCommand(
-        name="Python Conference 2024",
-        description="Annual Python developer conference",
+        name="Tech Conference 2024",
         start_date=datetime.now() + timedelta(days=30),
-        end_date=datetime.now() + timedelta(days=31),
-        location="Jakarta Convention Center",
-        capacity=500,
-        organizer_id="ORG001"
+        end_date=datetime.now() + timedelta(days=32),
+        capacity=1000
     )
 
     event_agg = create_event_handler.handle(event_cmd)
@@ -76,35 +75,36 @@ def main():
     print("STEP 2: Adding Ticket Categories")
     print("-" * 80)
 
+    create_category_handler = container.get_create_ticket_category_handler()
+
     # Add VIP ticket category
-    vip_category = TicketCategory(
+    vip_cmd = CreateTicketCategoryCommand(
+        event_id=event_id,
         name="VIP",
         price=1500000.0,
         quota=100,
-        sales_start=datetime.now(),
-        sales_end=datetime.now() + timedelta(days=25),
-        is_active=True
+        sales_start_date=datetime.now(),
+        sales_end_date=datetime.now() + timedelta(days=25)
     )
-    event_agg.add_ticket_category(vip_category)
+    event_agg = create_category_handler.handle(vip_cmd)
     
     # Add Regular ticket category
-    regular_category = TicketCategory(
+    regular_cmd = CreateTicketCategoryCommand(
+        event_id=event_id,
         name="Regular",
         price=750000.0,
         quota=300,
-        sales_start=datetime.now(),
-        sales_end=datetime.now() + timedelta(days=25),
-        is_active=True
+        sales_start_date=datetime.now(),
+        sales_end_date=datetime.now() + timedelta(days=25)
     )
-    event_agg.add_ticket_category(regular_category)
+    event_agg = create_category_handler.handle(regular_cmd)
 
     print(f"✓ Added ticket categories:")
     for cat in event_agg.ticket_categories:
         print(f"  - {cat.name}: Rp {cat.price:,} (Quota: {cat.quota})")
     print()
 
-    # Save event with categories
-    event_id = container.event_repository.save(event_agg)
+    # Event is already saved inside create_category_handler
 
     # ==================== STEP 3: Publish Event ====================
     print("STEP 3: Publishing Event")
@@ -128,10 +128,9 @@ def main():
     available_events = get_events_handler.handle(query)
     
     print(f"✓ Found {len(available_events)} published events:")
-    for event in available_events:
-        print(f"  - {event.name}")
-        print(f"    Location: {event.location}")
-        print(f"    Date: {event.start_date.strftime('%Y-%m-%d')}")
+    for event_agg in available_events:
+        print(f"  - {event_agg.event.name}")
+        print(f"    Date: {event_agg.event.start_date.strftime('%Y-%m-%d')}")
     print()
 
     # ==================== STEP 5: Create Booking ====================
@@ -170,9 +169,8 @@ def main():
     
     pay_cmd = PayBookingCommand(
         booking_id=booking_id,
-        payment_amount=3000000.0
+        amount=3000000.0  # 2 VIP tickets
     )
-
     paid_booking = pay_handler.handle(pay_cmd)
     
     print(f"✓ Booking paid successfully")
@@ -214,9 +212,16 @@ def main():
 
     payout_handler = container.get_mark_refund_payout_handler()
     
+    # Simulate refund processing
+    txn_id = container.refund_payment_service.process_refund(
+        account_number="1234567890",
+        refund_amount=3000000.0,
+        reference_id=refund_id
+    )
+
     payout_cmd = MarkRefundPayoutCommand(
         refund_id=refund_id,
-        payment_reference="TXN202400123456"
+        payment_reference=txn_id
     )
     result = payout_handler.handle(payout_cmd)
     
@@ -242,6 +247,27 @@ def main():
     print(f"    - Paid: {report.booking_stats.paid}")
     print(f"    - Expired: {report.booking_stats.expired}")
     print(f"    - Refunded: {report.booking_stats.refunded}")
+    print()
+    # ==================== STEP 11: Cancel Event (Bonus for US 3) ====================
+    print("STEP 11: Cancelling another Event (Demo for US 3)")
+    print("-" * 80)
+
+    # Create another event to cancel
+    event2_cmd = CreateEventCommand(
+        name="Cancelled Conference",
+        start_date=datetime.now() + timedelta(days=30),
+        end_date=datetime.now() + timedelta(days=31),
+        capacity=100
+    )
+    event2_agg = create_event_handler.handle(event2_cmd)
+    event2_id = event2_agg.event.event_id
+
+    cancel_handler = container.get_cancel_event_handler()
+    cancel_cmd = CancelEventCommand(event_id=event2_id)
+    cancelled_event_agg = cancel_handler.handle(cancel_cmd)
+
+    print(f"✓ Event {cancelled_event_agg.event.name} has been cancelled")
+    print(f"  Status: {cancelled_event_agg.event.status}")
     print()
 
     # ==================== Summary ====================

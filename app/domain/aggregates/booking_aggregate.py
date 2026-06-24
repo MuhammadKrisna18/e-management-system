@@ -3,9 +3,11 @@ from datetime import datetime
 from app.domain.entities.booking import Booking
 from app.domain.entities.ticket import Ticket
 from app.domain.value_objects.ticket_code import TicketCode
-from app.domain.events.ticket_reserved import TicketReserved
-from app.domain.events.booking_paid import BookingPaid
-from app.domain.events.booking_expired import BookingExpired
+from app.domain.events.booking_events import (
+    BookingPaid,
+    BookingExpired,
+    TicketReserved
+)
 
 
 class BookingAggregate:
@@ -42,17 +44,14 @@ class BookingAggregate:
                 booking_id=self.booking.booking_id,
                 event_id=self.booking.event_id,
                 ticket_category_name=self.booking.ticket_category_name,
-                price=self.booking.unit_price,
+                price=0.0,
             )
             self.booking.add_ticket(ticket)
 
         self.domain_events.append(
             TicketReserved(
                 booking_id=self.booking.booking_id,
-                event_id=self.booking.event_id,
-                ticket_category=self.booking.ticket_category_name,
                 quantity=self.booking.quantity,
-                total_price=self.booking.total_price.amount,
             )
         )
 
@@ -70,9 +69,7 @@ class BookingAggregate:
         self.domain_events.append(
             BookingPaid(
                 booking_id=self.booking.booking_id,
-                event_id=self.booking.event_id,
-                customer_id=self.booking.customer_id,
-                total_price=self.booking.total_price.amount,
+                amount=self.booking.total_price,
                 payment_reference=payment_reference,
             )
         )
@@ -87,9 +84,6 @@ class BookingAggregate:
         self.domain_events.append(
             BookingExpired(
                 booking_id=self.booking.booking_id,
-                event_id=self.booking.event_id,
-                ticket_category=self.booking.ticket_category_name,
-                quantity=self.booking.quantity,
             )
         )
 

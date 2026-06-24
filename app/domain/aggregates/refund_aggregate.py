@@ -41,7 +41,7 @@ class RefundAggregate:
         self.refund.approved_at = datetime.now()
 
         self.domain_events.append(
-            RefundApproved()
+            RefundApproved(self.refund.refund_id)
         )
 
     def reject_refund(self, reason: str):
@@ -69,7 +69,7 @@ class RefundAggregate:
         self.refund.rejected_at = datetime.now()
 
         self.domain_events.append(
-            RefundRejected()
+            RefundRejected(self.refund.refund_id, reason)
         )
 
     def mark_as_paid_out(self, payment_reference: str):
@@ -92,7 +92,7 @@ class RefundAggregate:
         self.refund.paid_out_at = datetime.now()
 
         self.domain_events.append(
-            RefundPaidOut()
+            RefundPaidOut(self.refund.refund_id, payment_reference)
         )
     
     # Legacy method names for backward compatibility

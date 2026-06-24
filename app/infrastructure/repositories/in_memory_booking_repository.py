@@ -15,6 +15,7 @@ class InMemoryBookingRepository(BookingRepository):
     def __init__(self):
         """Initialize in-memory storage."""
         self._bookings: Dict[str, BookingAggregate] = {}
+        self._booking_counter = 0
 
     def save(self, booking_aggregate: BookingAggregate) -> str:
         """
@@ -26,6 +27,10 @@ class InMemoryBookingRepository(BookingRepository):
         Returns:
             str: Booking ID
         """
+        if not booking_aggregate.booking.booking_id:
+            self._booking_counter += 1
+            booking_aggregate.booking.booking_id = f"BKG{self._booking_counter:04d}"
+            
         booking_id = booking_aggregate.booking.booking_id
         self._bookings[booking_id] = booking_aggregate
         return booking_id

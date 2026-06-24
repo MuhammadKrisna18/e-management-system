@@ -2,9 +2,11 @@ class PayBookingHandler:
 
     def __init__(
         self,
-        repository
+        repository,
+        payment_gateway
     ):
         self.repository = repository
+        self.payment_gateway = payment_gateway
 
     def handle(
         self,
@@ -17,8 +19,10 @@ class PayBookingHandler:
             )
         )
 
-        aggregate.pay(
-            command.amount
+        transaction_id = self.payment_gateway.charge(command.amount)
+
+        aggregate.pay_booking(
+            payment_reference=transaction_id
         )
 
         self.repository.save(

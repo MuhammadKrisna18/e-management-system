@@ -1,9 +1,9 @@
 """Mock Payment Gateway Service Implementation"""
 from typing import Dict, Optional
-from app.application.services.payment_gateway_service import PaymentGatewayService
+from app.application.interfaces.payment_gateway import PaymentGateway
 
 
-class MockPaymentGatewayService(PaymentGatewayService):
+class MockPaymentGatewayService(PaymentGateway):
     """
     Mock implementation of PaymentGatewayService.
     Simulates payment processing for development and testing.
@@ -13,6 +13,10 @@ class MockPaymentGatewayService(PaymentGatewayService):
         """Initialize mock service with transaction tracking."""
         self._transactions: Dict[str, dict] = {}
         self._transaction_counter = 0
+
+    def charge(self, amount: float) -> str:
+        """Implement PaymentGateway interface."""
+        return self.process_payment(amount)
 
     def process_payment(
         self, amount: float, payment_method: str = "card"

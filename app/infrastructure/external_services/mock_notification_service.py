@@ -1,6 +1,6 @@
 """Mock Notification Service Implementation"""
 from typing import List
-from app.application.services.notification_service import NotificationService
+from app.application.interfaces.notification_service import NotificationService
 
 
 class MockNotificationService(NotificationService):
@@ -12,6 +12,14 @@ class MockNotificationService(NotificationService):
     def __init__(self):
         """Initialize mock service with notification log."""
         self._notifications: List[dict] = []
+
+    def send(self, destination: str, message: str):
+        """Implement NotificationService interface."""
+        self._log_notification({
+            "type": "generic",
+            "destination": destination,
+            "message": message
+        })
 
     def send_booking_confirmation(
         self, customer_id: str, booking_id: str, total_price: float

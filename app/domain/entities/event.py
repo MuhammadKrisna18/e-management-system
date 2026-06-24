@@ -14,3 +14,4 @@ class Event:
         self.end_date = end_date
         self.capacity = capacity
         self.status = "Draft"
+        self.event_id = None

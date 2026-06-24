@@ -1,4 +1,5 @@
 from app.domain.entities.event import Event
+from app.domain.aggregates.event_aggregate import EventAggregate
 
 
 class CreateEventHandler:
@@ -21,8 +22,10 @@ class CreateEventHandler:
             command.capacity
         )
 
+        event_aggregate = EventAggregate(event)
+
         self.repository.save(
-            event
+            event_aggregate
         )
 
-        return event
+        return event_aggregate

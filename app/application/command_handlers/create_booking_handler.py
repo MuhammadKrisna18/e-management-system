@@ -1,5 +1,5 @@
 from app.domain.entities.booking import Booking
-
+from app.domain.aggregates.booking_aggregate import BookingAggregate
 
 class CreateBookingHandler:
 
@@ -16,11 +16,15 @@ class CreateBookingHandler:
 
         booking = Booking(
             command.customer_id,
+            command.event_id,
+            command.ticket_category_name,
             command.quantity
         )
 
+        booking_agg = BookingAggregate(booking)
+
         self.repository.save(
-            booking
+            booking_agg
         )
 
-        return booking
+        return booking_agg

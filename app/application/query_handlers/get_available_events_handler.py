@@ -13,5 +13,5 @@ class GetAvailableEventsHandler:
 
         return (
             self.repository
-            .get_published_events()
+            .find_published()
         )
