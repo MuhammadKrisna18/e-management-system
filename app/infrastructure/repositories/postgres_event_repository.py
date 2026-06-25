@@ -35,7 +35,7 @@ class PostgresEventRepository(EventRepository):
                 tc_model = TicketCategoryModel(event_id=event.event_id, name=category.name)
                 event_model.ticket_categories.append(tc_model)
             
-            tc_model.price = category.price.amount
+            tc_model.price = category.price if isinstance(category.price, float) else float(category.price)
             tc_model.quota = category.quota
             tc_model.sales_start_date = category.sales_start_date
             tc_model.sales_end_date = category.sales_end_date
@@ -62,10 +62,11 @@ class PostgresEventRepository(EventRepository):
         for tc_model in event_model.ticket_categories:
             category = TicketCategory(
                 name=tc_model.name,
-                price=Money(tc_model.price),
+                price=tc_model.price,
                 quota=tc_model.quota,
                 sales_start_date=tc_model.sales_start_date,
-                sales_end_date=tc_model.sales_end_date
+                sales_end_date=tc_model.sales_end_date,
+                event_start_date=event_model.start_date
             )
             if not tc_model.is_active:
                 category.disable()

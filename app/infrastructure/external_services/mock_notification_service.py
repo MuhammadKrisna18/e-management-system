@@ -1,7 +1,8 @@
-from app.application.interfaces.notification_service import NotificationServiceInterface
+from app.application.interfaces.notification_service import NotificationService
 
-class MockNotificationService(NotificationServiceInterface):
-    def send_email(self, recipient: str, subject: str, body: str) -> None:
-        print(f"[MockNotificationService] Sending Email to {recipient}")
-        print(f"  Subject: {subject}")
-        print(f"  Body: {body}")
+
+class MockNotificationService(NotificationService):
+    """Mock notification service — prints to console."""
+
+    def send(self, destination: str, message: str) -> None:
+        print(f"[MockNotificationService] To: {destination} | Message: {message}")

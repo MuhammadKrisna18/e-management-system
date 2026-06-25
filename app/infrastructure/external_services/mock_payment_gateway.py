@@ -1,8 +1,15 @@
-from app.application.interfaces.payment_gateway import PaymentGatewayInterface
-from app.domain.value_objects.money import Money
+import uuid
+from app.application.interfaces.payment_gateway import PaymentGateway
 
-class MockPaymentGateway(PaymentGatewayInterface):
-    def process_payment(self, booking_id: str, amount: Money) -> bool:
-        # Simulate payment processing
-        print(f"[MockPaymentGateway] Processing payment for Booking {booking_id} of amount {amount.amount}")
-        return True
+
+class MockPaymentGateway(PaymentGateway):
+    """Mock payment gateway for testing — always succeeds."""
+
+    def charge(self, amount) -> str:
+        txn_id = f"TXN-{uuid.uuid4().hex[:10].upper()}"
+        print(f"[MockPaymentGateway] Charged {amount}. Transaction ID: {txn_id}")
+        return txn_id
+
+
+# Alias used by container
+MockPaymentGatewayService = MockPaymentGateway
