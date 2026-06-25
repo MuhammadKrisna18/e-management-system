@@ -74,3 +74,30 @@ class PostgresBookingRepository(BookingRepository):
             booking.tickets.append(t)
             
         return BookingAggregate(booking)
+
+    def find_active_by_customer_and_event(
+        self,
+        customer_id: str,
+        event_id: str
+    ) -> Optional[BookingAggregate]:
+        model = self.session.query(BookingModel).filter(
+            BookingModel.customer_id == customer_id,
+            BookingModel.event_id == event_id,
+            BookingModel.status.in_(["Pending", "Paid"])
+        ).first()
+        if not model:
+            return None
+        return self.get_by_id(model.booking_id)
+
+    def get_booked_quantity_for_category(
+        self,
+        event_id: str,
+        ticket_category_name: str
+    ) -> int:
+        from sqlalchemy import func
+        result = self.session.query(func.sum(BookingModel.quantity)).filter(
+            BookingModel.event_id == event_id,
+            BookingModel.ticket_category_name == ticket_category_name,
+            BookingModel.status.in_(["Pending", "Paid"])
+        ).scalar()
+        return result or 0

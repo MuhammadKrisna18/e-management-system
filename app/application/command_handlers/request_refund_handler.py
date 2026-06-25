@@ -54,6 +54,7 @@ class RequestRefundHandler:
             event_id=booking.event_id,
             refund_amount=booking.total_price,  # Assuming booking has total_price
             refund_deadline=refund_deadline,
+            reason=command.reason,
         )
 
         # Create aggregate

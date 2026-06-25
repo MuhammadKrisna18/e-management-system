@@ -58,9 +58,28 @@ class PostgresRefundRepository(RefundRepository):
             
         return RefundAggregate(refund)
 
-    def get_by_booking_id(self, booking_id: str) -> Optional[RefundAggregate]:
+    def find_by_booking(self, booking_id: str) -> Optional[RefundAggregate]:
         model = self.session.query(RefundModel).filter(RefundModel.booking_id == booking_id).first()
         if not model:
             return None
-            
         return self.get_by_id(model.refund_id)
+
+    def find_by_customer(self, customer_id: str) -> list:
+        models = self.session.query(RefundModel).filter(RefundModel.customer_id == customer_id).all()
+        return [self.get_by_id(model.refund_id) for model in models if model]
+
+    def find_approved_pending_payout(self) -> list:
+        models = self.session.query(RefundModel).filter(RefundModel.status == "Approved").all()
+        return [self.get_by_id(model.refund_id) for model in models if model]
+
+    def find_all(self) -> list:
+        models = self.session.query(RefundModel).all()
+        return [self.get_by_id(model.refund_id) for model in models if model]
+
+    def delete(self, refund_id: str) -> bool:
+        model = self.session.query(RefundModel).filter(RefundModel.refund_id == refund_id).first()
+        if model:
+            self.session.delete(model)
+            self.session.commit()
+            return True
+        return False

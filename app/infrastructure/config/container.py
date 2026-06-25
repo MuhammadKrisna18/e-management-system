@@ -1,16 +1,9 @@
 
-from app.infrastructure.repositories.in_memory_event_repository import (
-    InMemoryEventRepository
-)
-from app.infrastructure.repositories.in_memory_booking_repository import (
-    InMemoryBookingRepository
-)
-from app.infrastructure.repositories.in_memory_refund_repository import (
-    InMemoryRefundRepository
-)
-from app.infrastructure.repositories.in_memory_ticket_repository import (
-    InMemoryTicketRepository
-)
+from app.infrastructure.repositories.postgres_event_repository import PostgresEventRepository
+from app.infrastructure.repositories.postgres_booking_repository import PostgresBookingRepository
+from app.infrastructure.repositories.postgres_refund_repository import PostgresRefundRepository
+from app.infrastructure.repositories.postgres_ticket_repository import PostgresTicketRepository
+from app.infrastructure.database.database import SessionLocal
 
 from app.infrastructure.external_services.mock_payment_gateway import (
     MockPaymentGatewayService
@@ -56,6 +49,12 @@ from app.application.command_handlers.reject_refund_handler import (
 from app.application.command_handlers.mark_refund_payout_handler import (
     MarkRefundPayoutHandler
 )
+from app.application.command_handlers.check_in_ticket_handler import (
+    CheckInTicketHandler
+)
+from app.application.command_handlers.expire_booking_handler import (
+    ExpireBookingHandler
+)
 
 # Query Handlers
 from app.application.query_handlers.get_available_events_handler import (
@@ -77,12 +76,15 @@ from app.application.query_handlers.report_query_handlers import (
 
 class Container:
 
-    def __init__(self):
+    def __init__(self, db_session=None):
+        # Initialize session
+        self.db_session = db_session or SessionLocal()
+        
         # Initialize repositories (singleton instances)
-        self.event_repository = InMemoryEventRepository()
-        self.booking_repository = InMemoryBookingRepository()
-        self.refund_repository = InMemoryRefundRepository()
-        self.ticket_repository = InMemoryTicketRepository()
+        self.event_repository = PostgresEventRepository(self.db_session)
+        self.booking_repository = PostgresBookingRepository(self.db_session)
+        self.refund_repository = PostgresRefundRepository(self.db_session)
+        self.ticket_repository = PostgresTicketRepository(self.db_session)
 
         # Initialize external services (singleton instances)
         self.payment_gateway = MockPaymentGatewayService()
@@ -101,6 +103,8 @@ class Container:
         self._approve_refund_handler = None
         self._reject_refund_handler = None
         self._mark_refund_payout_handler = None
+        self._check_in_ticket_handler = None
+        self._expire_booking_handler = None
 
         # Initialize query handlers (created on demand)
         self._get_available_events_handler = None
@@ -185,6 +189,21 @@ class Container:
             )
         return self._mark_refund_payout_handler
 
+    def get_check_in_ticket_handler(self) -> CheckInTicketHandler:
+        if self._check_in_ticket_handler is None:
+            self._check_in_ticket_handler = CheckInTicketHandler(
+                self.ticket_repository,
+                self.event_repository
+            )
+        return self._check_in_ticket_handler
+
+    def get_expire_booking_handler(self) -> ExpireBookingHandler:
+        if self._expire_booking_handler is None:
+            self._expire_booking_handler = ExpireBookingHandler(
+                self.booking_repository
+            )
+        return self._expire_booking_handler
+
     # Query Handlers
 
     def get_available_events_handler(self) -> GetAvailableEventsHandler:
@@ -240,13 +259,24 @@ class Container:
             )
         return self._get_event_participants_handler
 
+    def get_purchased_tickets_handler(self):
+        from app.application.query_handlers.ticket_query_handlers import GetPurchasedTicketsQueryHandler
+        if not hasattr(self, '_get_purchased_tickets_handler') or self._get_purchased_tickets_handler is None:
+            self._get_purchased_tickets_handler = GetPurchasedTicketsQueryHandler(
+                self.booking_repository,
+                self.ticket_repository,
+                self.event_repository
+            )
+        return self._get_purchased_tickets_handler
+
     # Utility methods
 
     def clear_all_data(self):
-        self.event_repository = InMemoryEventRepository()
-        self.booking_repository = InMemoryBookingRepository()
-        self.refund_repository = InMemoryRefundRepository()
-        self.ticket_repository = InMemoryTicketRepository()
+        # Only useful for tests if we want to reset; in production with Postgres we'd truncate tables
+        self.event_repository = PostgresEventRepository(self.db_session)
+        self.booking_repository = PostgresBookingRepository(self.db_session)
+        self.refund_repository = PostgresRefundRepository(self.db_session)
+        self.ticket_repository = PostgresTicketRepository(self.db_session)
 
     def reset_handlers(self):
         self._create_event_handler = None

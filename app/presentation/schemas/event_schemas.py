@@ -52,3 +52,59 @@ class EventSalesReportResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AvailableEventSchema(BaseModel):
+    event_id: str
+    name: str
+    start_date: datetime
+    location: str
+    lowest_ticket_price: float
+    
+    class Config:
+        from_attributes = True
+
+class AvailableEventsResponse(BaseModel):
+    events: List[AvailableEventSchema]
+
+class TicketCategoryDetailSchema(BaseModel):
+    name: str
+    price: float
+    status: str
+    
+    class Config:
+        from_attributes = True
+
+class EventDetailResponse(BaseModel):
+    event_id: str
+    name: str
+    description: str
+    start_date: datetime
+    location: str
+    organizer: str
+    ticket_categories: List[TicketCategoryDetailSchema]
+    
+    class Config:
+        from_attributes = True
+
+class ParticipantSchema(BaseModel):
+    customer_id: str
+    ticket_category: str
+    ticket_code: str
+    check_in_status: str
+    checked_in_at: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+class EventParticipantsResponse(BaseModel):
+    event_id: str
+    event_name: str
+    participants: List[ParticipantSchema]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+    generated_at: str
+    
+    class Config:
+        from_attributes = True

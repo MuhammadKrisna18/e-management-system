@@ -59,13 +59,10 @@ class FakeEventRepository:
     ):
         return self.aggregate
 
-    def find_published(
-        self
-    ):
-        return [
-            "Event A",
-            "Event B"
-        ]
+    def find_published(self):
+        if self.aggregate:
+            return [self.aggregate]
+        return []
 
 
 # =========================================================
@@ -166,24 +163,18 @@ def test_publish_event_handler():
 # QUERY HANDLER TESTS
 # =========================================================
 
+from app.domain.value_objects.money import Money
+
 def test_get_available_events_handler():
+    event = Event("Test Event", datetime(2025, 1, 1), datetime(2025, 1, 2), 100)
+    aggregate = EventAggregate(event)
+    category = TicketCategory("Regular", 100.0, 10, datetime(2024, 1, 1), datetime(2025, 1, 1), datetime(2025, 1, 1))
+    aggregate.add_ticket_category(category)
+    
+    repository = FakeEventRepository(aggregate)
+    handler = GetAvailableEventsHandler(repository)
+    result = handler.handle(GetAvailableEventsQuery())
 
-    repository = (
-        FakeEventRepository()
-    )
-
-    handler = (
-        GetAvailableEventsHandler(
-            repository
-        )
-    )
-
-    result = handler.handle(
-        GetAvailableEventsQuery()
-    )
-
-    assert len(result) == 2
-
-    assert result[0] == "Event A"
-
-    assert result[1] == "Event B"
+    assert len(result.events) == 1
+    assert result.events[0].name == "Test Event"
+    assert result.events[0].lowest_ticket_price == 100.0

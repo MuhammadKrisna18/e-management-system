@@ -12,3 +12,12 @@ class GetEventParticipantsQuery:
         self.event_id = event_id
         self.page = page
         self.page_size = page_size
+
+class GetAvailableEventsQuery:
+    def __init__(self, date: str = None, location: str = None):
+        self.date = date
+        self.location = location
+
+class GetEventDetailsQuery:
+    def __init__(self, event_id: str):
+        self.event_id = event_id

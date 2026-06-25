@@ -13,6 +13,7 @@ class Refund:
         event_id: str,
         refund_amount: Money,
         refund_deadline: datetime,
+        reason: str,
     ):
         self.refund_id = refund_id
         self.booking_id = booking_id
@@ -20,6 +21,7 @@ class Refund:
         self.event_id = event_id
         self.refund_amount = refund_amount
         self.refund_deadline = refund_deadline
+        self.reason = reason
         
         # State management
         self.status = RefundStatus.REQUESTED
